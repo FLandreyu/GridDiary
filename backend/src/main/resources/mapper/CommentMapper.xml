@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flandreyu.mapper.CommentMapper">
+
+    <!-- 不带作者信息的字段（entity 用） -->
+    <sql id="columns"> id, diary_id, user_id, parent_id, content, created_at </sql>
+
+    <!-- 带作者昵称/头像的字段（JOIN user） -->
+    <sql id="voColumns"> c.id, c.diary_id, c.user_id, c.parent_id, c.content, c.created_at,
+        u.nickname AS author_nickname, u.avatar AS author_avatar </sql>
+
+    <insert id="insert" parameterType="Comment" useGeneratedKeys="true" keyProperty="id"> INSERT
+        INTO `comment` (diary_id, user_id, parent_id, content) VALUES (#{diaryId}, #{userId},
+        #{parentId}, #{content}) </insert>
+
+    <select id="selectById" parameterType="long" resultType="Comment"> SELECT <include
+            refid="columns" /> FROM `comment` WHERE id = #{id} </select>
+
+    <!-- 某日记全部评论（一级+回复）按时间升序，树形组装交给 service -->
+    <select id="selectVOByDiaryId" parameterType="long" resultType="com.flandreyu.vo.CommentVO">
+        SELECT <include refid="voColumns" /> FROM `comment` c LEFT JOIN `user` u ON c.user_id = u.id
+        WHERE c.diary_id = #{diaryId} ORDER BY c.created_at ASC, c.id ASC </select>
+
+    <delete id="deleteById" parameterType="long"> DELETE FROM `comment` WHERE id = #{id} </delete>
+
+    <delete id="deleteByParentId" parameterType="long"> DELETE FROM `comment` WHERE parent_id =
+        #{parentId} </delete>
+
+    <delete id="deleteByDiaryId" parameterType="long"> DELETE FROM `comment` WHERE diary_id =
+        #{diaryId} </delete>
+
+    <select id="countByDiaryId" parameterType="long" resultType="long"> SELECT COUNT(*) FROM
+        `comment` WHERE diary_id = #{diaryId} </select>
+
+</mapper>

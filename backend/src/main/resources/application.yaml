@@ -1,0 +1,26 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: backend
+  datasource:
+    url: jdbc:mysql://localhost:3306/grid_diary?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: CHANGE_ME
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  servlet:
+    multipart:
+      max-file-size: 5MB          # 单张图片上限
+      max-request-size: 50MB      # 一次请求总大小（多图上传）
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml   # Mapper XML 位置
+  type-aliases-package: com.flandreyu.entity # 实体别名包
+  configuration:
+    map-underscore-to-camel-case: true       # 下划线转驼峰
+
+# 图片上传目录（相对 backend 运行目录；也可写绝对路径）
+app:
+  upload-dir: ./upload
+

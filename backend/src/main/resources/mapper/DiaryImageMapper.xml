@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flandreyu.mapper.DiaryImageMapper">
+
+    <sql id="columns">
+        id, diary_id, original_url, thumb_url, sort_order, created_at
+    </sql>
+
+    <insert id="insert" parameterType="DiaryImage" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `diary_image` (diary_id, original_url, thumb_url, sort_order)
+        VALUES (#{diaryId}, #{originalUrl}, #{thumbUrl}, #{sortOrder})
+    </insert>
+
+    <select id="selectByDiaryId" parameterType="long" resultType="DiaryImage"> SELECT <include
+            refid="columns" /> FROM `diary_image` WHERE diary_id = #{diaryId} ORDER BY sort_order
+        ASC, id ASC </select>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM `diary_image` WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByDiaryId" parameterType="long">
+        DELETE FROM `diary_image` WHERE diary_id = #{diaryId}
+    </delete>
+
+</mapper>

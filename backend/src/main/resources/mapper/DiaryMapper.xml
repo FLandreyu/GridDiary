@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flandreyu.mapper.DiaryMapper">
+
+    <!-- 不带作者信息的字段 -->
+    <sql id="columns"> id, user_id, title, content, cover, is_public, like_count, created_at,
+        updated_at </sql>
+
+    <!-- 带作者昵称/头像的字段（JOIN user） -->
+    <sql id="voColumns"> d.id, d.user_id, d.title, d.content, d.cover, d.is_public, d.like_count,
+        d.created_at, d.updated_at, u.nickname AS author_nickname, u.avatar AS author_avatar </sql>
+
+    <insert id="insert" parameterType="Diary" useGeneratedKeys="true" keyProperty="id"> INSERT INTO
+        `diary` (user_id, title, content, cover, is_public) VALUES (#{userId}, #{title}, #{content},
+        #{cover}, #{isPublic}) </insert>
+
+    <select id="findById" parameterType="long" resultType="Diary"> SELECT <include refid="columns" />
+        FROM `diary` WHERE id = #{id} </select>
+
+    <select id="selectVOById" parameterType="long" resultType="com.flandreyu.vo.DiaryVO"> SELECT <include
+            refid="voColumns" /> FROM `diary` d LEFT JOIN `user` u ON d.user_id = u.id WHERE d.id =
+        #{id} </select>
+
+    <!-- 首页/列表分页：仅公开；userId 非空则只看该作者公开；keyword 非空则标题/正文模糊搜索 -->
+    <select id="selectPage" resultType="com.flandreyu.vo.DiaryVO"> SELECT <include refid="voColumns" />
+        FROM `diary` d LEFT JOIN `user` u ON d.user_id = u.id <where> d.is_public = 1 <if
+                test="userId != null"> AND d.user_id = #{userId} </if>
+            <if
+                test="keyword != null and keyword != ''"> AND (d.title LIKE CONCAT('%', #{keyword},
+        '%') OR d.content LIKE CONCAT('%', #{keyword}, '%')) </if>
+        </where> ORDER BY
+        d.created_at DESC, d.id DESC LIMIT #{offset}, #{size} </select>
+
+    <!-- 与 selectPage 条件一致的总数 -->
+    <select id="countPage" resultType="long"> SELECT COUNT(*) FROM `diary` d <where> d.is_public = 1 <if
+                test="userId != null"> AND d.user_id = #{userId} </if>
+            <if
+                test="keyword != null and keyword != ''"> AND (d.title LIKE CONCAT('%', #{keyword},
+        '%') OR d.content LIKE CONCAT('%', #{keyword}, '%')) </if>
+        </where>
+    </select>
+
+    <!-- 我的日记（含私密），分页 -->
+    <select id="selectByUserId" resultType="com.flandreyu.vo.DiaryVO"> SELECT <include
+            refid="voColumns" /> FROM `diary` d LEFT JOIN `user` u ON d.user_id = u.id WHERE
+        d.user_id = #{userId} ORDER BY d.created_at DESC, d.id DESC LIMIT #{offset}, #{size} </select>
+
+    <select id="countByUserId" resultType="long"> SELECT COUNT(*) FROM `diary` WHERE user_id =
+        #{userId} </select>
+
+    <!-- 热门排行榜：按点赞数倒序取前 N（仅公开） -->
+    <select id="selectHot" resultType="com.flandreyu.vo.DiaryVO"> SELECT <include refid="voColumns" />
+        FROM `diary` d LEFT JOIN `user` u ON d.user_id = u.id WHERE d.is_public = 1 ORDER BY
+        d.like_count DESC, d.created_at DESC LIMIT #{limit} </select>
+
+    <!-- 动态更新：标题 / 正文 / 封面 / 是否公开按需更新 -->
+    <update id="update" parameterType="Diary"> UPDATE `diary` <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="content != null">content =
+        #{content},</if>
+            <if test="cover != null">cover = #{cover},</if>
+            <if test="isPublic != null">is_public
+        = #{isPublic},</if>
+        </set> WHERE id = #{id} </update>
+
+    <!-- 编辑整行更新（cover 允许置空） -->
+    <update id="updateFull" parameterType="Diary"> UPDATE `diary` SET title = #{title}, content =
+        #{content}, cover = #{cover}, is_public = #{isPublic} WHERE id = #{id} </update>
+
+    <!-- 点赞数增减，delta 为 +1 / -1 -->
+    <update id="changeLikeCount"> UPDATE `diary` SET like_count = like_count + #{delta} WHERE id =
+        #{id} </update>
+
+    <delete id="deleteById" parameterType="long"> DELETE FROM `diary` WHERE id = #{id} </delete>
+
+</mapper>
