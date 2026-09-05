@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flandreyu.mapper.MessageMapper">
+
+    <sql id="columns"> id, from_user_id, to_user_id, content, is_read, created_at </sql>
+
+    <insert id="insert" parameterType="Message" useGeneratedKeys="true" keyProperty="id"> INSERT
+        INTO `message` (from_user_id, to_user_id, content) VALUES (#{fromUserId}, #{toUserId},
+        #{content}) </insert>
+
+    <!-- 我收到的私信（新→旧） -->
+    <select id="selectReceived" resultType="Message"> SELECT <include refid="columns" /> FROM
+        `message` WHERE to_user_id = #{toUserId} ORDER BY created_at DESC, id DESC </select>
+
+    <!-- 我发出的私信（新→旧） -->
+    <select id="selectSent" resultType="Message"> SELECT <include refid="columns" /> FROM `message`
+        WHERE from_user_id = #{fromUserId} ORDER BY created_at DESC, id DESC </select>
+
+    <!-- 与某人历史会话：倒序取最近 limit 条（展示时可再反转为正序） -->
+    <select id="selectConversation" resultType="Message"> SELECT <include refid="columns" /> FROM
+        `message` WHERE (from_user_id = #{userA} AND to_user_id = #{userB}) OR (from_user_id =
+        #{userB} AND to_user_id = #{userA}) ORDER BY created_at DESC, id DESC LIMIT #{limit} </select>
+
+    <!-- 某人发给我的未读全部置为已读 -->
+    <update id="markRead"> UPDATE `message` SET is_read = 1 WHERE to_user_id = #{toUserId} AND
+        from_user_id = #{fromUserId} AND is_read = 0 </update>
+
+    <select id="countUnread" resultType="long"> SELECT COUNT(*) FROM `message` WHERE to_user_id =
+        #{toUserId} AND is_read = 0 </select>
+
+    <!-- 会话列表：每个联系人取最后一条消息（含对方信息 + 未读数），按最近时间倒序 -->
+    <select id="selectConversations" resultType="com.flandreyu.vo.ConversationVO"> SELECT other.id
+        AS peer_id, other.nickname AS peer_nickname, other.avatar AS peer_avatar, m.id AS
+        last_message_id, m.from_user_id AS last_from_user_id, m.content AS last_content,
+        m.created_at AS last_time, (SELECT COUNT(*) FROM `message` x WHERE x.to_user_id = #{me} AND
+        x.from_user_id = other.id AND x.is_read = 0) AS unread FROM `message` m JOIN `user` other ON
+        other.id = IF(m.from_user_id = #{me}, m.to_user_id, m.from_user_id) WHERE m.id IN ( SELECT
+        MAX(m2.id) FROM `message` m2 WHERE m2.from_user_id = #{me} OR m2.to_user_id = #{me} GROUP BY
+        IF(m2.from_user_id = #{me}, m2.to_user_id, m2.from_user_id) ) ORDER BY m.created_at DESC,
+        m.id DESC </select>
+
+</mapper>
