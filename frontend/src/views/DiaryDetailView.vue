@@ -255,6 +255,16 @@ async function onDeleteDiary() {
           </span>
         </div>
 
+        <!-- 信息位 -->
+        <div class="gd-chips">
+          <span class="gd-chip hot">♥ {{ likeCount }}</span>
+          <span class="gd-chip">🖼 {{ images.length }} 张图</span>
+          <span class="gd-chip">💬 {{ commentCount }} 条评论</span>
+          <span class="gd-chip">
+            {{ diary.isPublic ? "🌐 公开" : "🔒 仅自己可见" }}
+          </span>
+        </div>
+
         <!-- 点赞 -->
         <div class="action-bar">
           <el-button
@@ -468,16 +478,16 @@ async function onDeleteDiary() {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #606266;
+  color: var(--gd-text-sub);
   font-size: 13px;
   margin-bottom: 14px;
 }
 .nick {
   font-weight: 600;
-  color: #303133;
+  color: var(--gd-text);
 }
 .time {
-  color: #909399;
+  color: var(--gd-text-sub);
 }
 .owner-ops {
   margin-left: auto;
@@ -497,7 +507,7 @@ async function onDeleteDiary() {
   white-space: pre-wrap;
   line-height: 1.8;
   font-size: 15px;
-  color: #303133;
+  color: var(--gd-text);
   margin-bottom: 18px;
 }
 
@@ -513,7 +523,7 @@ async function onDeleteDiary() {
   overflow: hidden;
   position: relative;
   cursor: zoom-in;
-  border: 1px solid #ebeef5;
+  border: 1px solid var(--gd-border);
 }
 .g-img {
   width: 100%;
@@ -547,7 +557,7 @@ async function onDeleteDiary() {
   margin-bottom: 18px;
 }
 .c-replying {
-  color: #409eff;
+  color: var(--gd-primary);
   font-size: 13px;
   margin-top: 6px;
 }
@@ -565,7 +575,7 @@ async function onDeleteDiary() {
 .c-replies {
   margin-top: 12px;
   padding-left: 40px;
-  border-left: 2px solid #f0f2f5;
+  border-left: 2px solid var(--gd-border);
 }
 .c-reply {
   display: flex;
@@ -582,11 +592,11 @@ async function onDeleteDiary() {
   gap: 8px;
 }
 .c-time {
-  color: #b1b3b8;
+  color: var(--gd-text-sub);
   font-size: 12px;
 }
 .c-text {
-  color: #303133;
+  color: var(--gd-text);
   font-size: 14px;
   margin: 4px 0 2px;
   line-height: 1.6;
@@ -600,8 +610,8 @@ async function onDeleteDiary() {
   justify-content: center;
   align-items: center;
   min-height: 320px;
-  background: #f5f7fa;
-  border-radius: 8px;
+  background: var(--gd-surface-soft);
+  border-radius: var(--gd-radius-sm);
   overflow: hidden;
 }
 .lightbox-img {

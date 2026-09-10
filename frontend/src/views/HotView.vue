@@ -36,7 +36,9 @@ onMounted(async () => {
         class="row"
         @click="router.push(`/diary/${d.id}`)"
       >
-        <span :class="rankClass(i)">{{ i + 1 }}</span>
+        <span :class="rankClass(i)">{{
+          i < 3 ? ["🥇", "🥈", "🥉"][i] : i + 1
+        }}</span>
         <el-image
           v-if="d.cover"
           :src="d.cover"
@@ -49,6 +51,7 @@ onMounted(async () => {
           <div class="d-title">{{ d.title }}</div>
           <div class="d-meta">by {{ d.authorNickname || "匿名" }}</div>
         </div>
+        <span class="gd-chip">💬 {{ d.commentCount ?? 0 }}</span>
         <span class="likes">♥ {{ d.likeCount ?? 0 }}</span>
       </div>
     </el-card>
@@ -70,10 +73,10 @@ onMounted(async () => {
   gap: 14px;
   padding: 12px 8px;
   cursor: pointer;
-  border-bottom: 1px solid #f0f2f5;
+  border-bottom: 1px solid var(--gd-border);
 }
 .row:hover {
-  background: #f5f7fa;
+  background: var(--gd-surface-soft);
 }
 .row:last-child {
   border-bottom: none;
@@ -85,8 +88,8 @@ onMounted(async () => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #f0f2f5;
-  color: #909399;
+  background: var(--gd-surface-soft);
+  color: var(--gd-text-sub);
   font-weight: 700;
   font-size: 14px;
   flex-shrink: 0;
@@ -113,7 +116,11 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #eef3fb, #e6f7ff);
+  background: linear-gradient(
+    135deg,
+    rgba(124, 108, 255, 0.18),
+    rgba(63, 216, 255, 0.16)
+  );
   font-size: 26px;
 }
 .info {
@@ -122,18 +129,18 @@ onMounted(async () => {
 }
 .d-title {
   font-weight: 600;
-  color: #303133;
+  color: var(--gd-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .d-meta {
   font-size: 12px;
-  color: #909399;
+  color: var(--gd-text-sub);
   margin-top: 4px;
 }
 .likes {
-  color: #f56c6c;
+  color: var(--gd-heart);
   font-size: 13px;
   flex-shrink: 0;
 }

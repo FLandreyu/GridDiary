@@ -74,10 +74,10 @@ onMounted(load);
   gap: 12px;
   padding: 12px 6px;
   cursor: pointer;
-  border-bottom: 1px solid #f0f2f5;
+  border-bottom: 1px solid var(--gd-border);
 }
 .row:hover {
-  background: #f5f7fa;
+  background: var(--gd-surface-soft);
 }
 .row:last-child {
   border-bottom: none;
@@ -94,11 +94,11 @@ onMounted(load);
   font-weight: 600;
 }
 .time {
-  color: #b1b3b8;
+  color: var(--gd-text-sub);
   font-size: 12px;
 }
 .last {
-  color: #909399;
+  color: var(--gd-text-sub);
   font-size: 13px;
   margin-top: 3px;
   white-space: nowrap;

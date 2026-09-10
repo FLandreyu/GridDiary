@@ -220,10 +220,10 @@ async function submit() {
 .img-add {
   width: 110px;
   height: 110px;
-  border-radius: 8px;
+  border-radius: 14px;
   overflow: hidden;
   position: relative;
-  border: 1px solid #dcdfe6;
+  border: 1px solid var(--gd-border);
 }
 .img {
   width: 100%;
@@ -248,18 +248,18 @@ async function submit() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 1px dashed #c0c4cc;
-  color: #909399;
+  border: 1px dashed var(--gd-border);
+  color: var(--gd-text-sub);
   cursor: pointer;
   gap: 2px;
 }
 .img-add:hover {
-  color: #409eff;
-  border-color: #409eff;
+  color: var(--gd-primary);
+  border-color: var(--gd-primary);
 }
 .tip {
   width: 100%;
-  color: #909399;
+  color: var(--gd-text-sub);
   font-size: 12px;
   margin-top: 8px;
 }

@@ -6,9 +6,11 @@
     <sql id="columns"> id, user_id, title, content, cover, is_public, like_count, created_at,
         updated_at </sql>
 
-    <!-- 带作者昵称/头像的字段（JOIN user） -->
+    <!-- 带作者昵称/头像的字段（JOIN user）＋图片数/评论数统计 -->
     <sql id="voColumns"> d.id, d.user_id, d.title, d.content, d.cover, d.is_public, d.like_count,
-        d.created_at, d.updated_at, u.nickname AS author_nickname, u.avatar AS author_avatar </sql>
+        d.created_at, d.updated_at, u.nickname AS author_nickname, u.avatar AS author_avatar,
+        (SELECT COUNT(*) FROM `diary_image` di WHERE di.diary_id = d.id) AS image_count, (SELECT
+        COUNT(*) FROM `comment` c WHERE c.diary_id = d.id) AS comment_count </sql>
 
     <insert id="insert" parameterType="Diary" useGeneratedKeys="true" keyProperty="id"> INSERT INTO
         `diary` (user_id, title, content, cover, is_public) VALUES (#{userId}, #{title}, #{content},
