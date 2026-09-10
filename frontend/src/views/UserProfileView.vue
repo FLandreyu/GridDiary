@@ -111,7 +111,7 @@ onMounted(() => {});
   font-weight: 700;
 }
 .uname {
-  color: #909399;
+  color: var(--gd-text-sub);
   font-size: 13px;
   margin-top: 4px;
 }

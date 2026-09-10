@@ -1,9 +1,12 @@
 <script setup>
+import { ref } from "vue";
 import { timeAgo } from "../utils/format";
 
 defineProps({
   diary: { type: Object, required: true },
 });
+
+const placeholderOk = ref(true);
 
 function firstChar(nick) {
   return (nick || "?").charAt(0).toUpperCase();
@@ -20,7 +23,20 @@ function firstChar(nick) {
         fit="cover"
         lazy
         class="cover-img"
-      />
+      >
+        <template #error>
+          <div class="cover-placeholder">
+            <img
+              v-if="placeholderOk"
+              :src="'/images/cover-placeholder.png'"
+              class="cover-img"
+              alt=""
+              @error="placeholderOk = false"
+            />
+            <span v-else>📔</span>
+          </div>
+        </template>
+      </el-image>
       <div v-else class="cover-placeholder">📔</div>
     </div>
     <!-- 标题 + 作者/时间 -->
@@ -43,9 +59,12 @@ function firstChar(nick) {
         </span>
         <span class="time">{{ timeAgo(diary.createdAt) }}</span>
       </div>
-      <div class="like-row">
-        <span class="heart" :class="{ active: false }">♥</span>
-        <span>{{ diary.likeCount ?? 0 }}</span>
+      <div class="gd-chips">
+        <span class="gd-chip hot"><i>♥</i>{{ diary.likeCount ?? 0 }}</span>
+        <span class="gd-chip"><i>💬</i>{{ diary.commentCount ?? 0 }}</span>
+        <span v-if="(diary.imageCount ?? 0) > 0" class="gd-chip">
+          <i>🖼</i>{{ diary.imageCount }}
+        </span>
       </div>
     </div>
   </div>
@@ -53,22 +72,22 @@ function firstChar(nick) {
 
 <style scoped>
 .diary-card {
-  background: #fff;
-  border-radius: 10px;
+  background: var(--gd-surface-solid);
+  border-radius: var(--gd-radius);
   overflow: hidden;
   cursor: pointer;
   transition:
     transform 0.15s ease,
     box-shadow 0.15s ease;
-  border: 1px solid #ebeef5;
+  border: 1px solid var(--gd-border);
 }
 .diary-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--gd-shadow-hover);
 }
 .cover {
   height: 160px;
-  background: #f0f2f5;
+  background: var(--gd-surface-soft);
   position: relative;
 }
 .cover-img {
@@ -83,7 +102,11 @@ function firstChar(nick) {
   align-items: center;
   justify-content: center;
   font-size: 56px;
-  background: linear-gradient(135deg, #eef3fb, #e6f7ff);
+  background: linear-gradient(
+    135deg,
+    rgba(124, 108, 255, 0.18),
+    rgba(63, 216, 255, 0.16)
+  );
 }
 .info {
   padding: 10px 12px 12px;
@@ -91,7 +114,7 @@ function firstChar(nick) {
 .title {
   font-size: 15px;
   font-weight: 600;
-  color: #303133;
+  color: var(--gd-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -101,7 +124,7 @@ function firstChar(nick) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: #909399;
+  color: var(--gd-text-sub);
   font-size: 12px;
 }
 .author {
@@ -112,7 +135,7 @@ function firstChar(nick) {
   cursor: pointer;
 }
 .author:hover .nick {
-  color: #409eff;
+  color: var(--gd-primary);
 }
 .nick {
   max-width: 90px;
@@ -126,12 +149,12 @@ function firstChar(nick) {
 .like-row {
   margin-top: 6px;
   font-size: 12px;
-  color: #909399;
+  color: var(--gd-text-sub);
   display: flex;
   align-items: center;
   gap: 3px;
 }
 .heart {
-  color: #f56c6c;
+  color: var(--gd-heart);
 }
 </style>

@@ -215,7 +215,7 @@ async function savePassword() {
 }
 .tip {
   font-size: 12px;
-  color: #909399;
+  color: var(--gd-text-sub);
   margin-top: 4px;
 }
 </style>

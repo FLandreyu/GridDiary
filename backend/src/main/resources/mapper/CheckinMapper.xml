@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flandreyu.mapper.CheckinMapper">
+
+    <sql id="columns"> id, user_id, checkin_date, fortune_level, fortune_stars, lucky_color,
+        lucky_color_hex, lucky_number, `suit`, `avoid`, fortune_text, created_at </sql>
+
+    <insert id="insert" parameterType="Checkin" useGeneratedKeys="true" keyProperty="id"> INSERT
+        INTO `checkin` (user_id, checkin_date, fortune_level, fortune_stars, lucky_color,
+        lucky_color_hex, lucky_number, `suit`, `avoid`, fortune_text) VALUES (#{userId},
+        #{checkinDate}, #{fortuneLevel}, #{fortuneStars}, #{luckyColor}, #{luckyColorHex},
+        #{luckyNumber}, #{suit}, #{avoid}, #{fortuneText}) </insert>
+
+    <select id="findByUserAndDate" resultType="Checkin"> SELECT <include refid="columns" /> FROM
+        `checkin` WHERE user_id = #{userId} AND checkin_date = #{date} </select>
+
+    <select id="findRecentDates" resultType="java.time.LocalDate"> SELECT checkin_date FROM
+        `checkin` WHERE user_id = #{userId} ORDER BY checkin_date DESC LIMIT #{limit} </select>
+
+    <select id="countByUser" parameterType="long" resultType="long"> SELECT COUNT(*) FROM `checkin`
+        WHERE user_id = #{userId} </select>
+
+</mapper>

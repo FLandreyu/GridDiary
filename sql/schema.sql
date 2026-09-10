@@ -114,3 +114,25 @@ CREATE TABLE `message` (
   CONSTRAINT `fk_message_from` FOREIGN KEY (`from_user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_message_to`   FOREIGN KEY (`to_user_id`)   REFERENCES `user` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '私信表';
+
+-- -------------------------------------------------------------
+-- 7. 每日打卡表（user_id + checkin_date 唯一，一天一次；打卡时生成今日运势）
+-- -------------------------------------------------------------
+DROP TABLE IF EXISTS `checkin`;
+CREATE TABLE `checkin` (
+  `id`              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '打卡ID',
+  `user_id`         BIGINT UNSIGNED NOT NULL                COMMENT '用户ID',
+  `checkin_date`    DATE            NOT NULL                COMMENT '打卡日期',
+  `fortune_level`   VARCHAR(8)      NOT NULL                COMMENT '运势等级：大吉/中吉/小吉/平',
+  `fortune_stars`   TINYINT         NOT NULL DEFAULT 3      COMMENT '运势星级 1~5',
+  `lucky_color`     VARCHAR(16)     NOT NULL                COMMENT '幸运色名称',
+  `lucky_color_hex` VARCHAR(16)     NOT NULL                COMMENT '幸运色色值',
+  `lucky_number`    TINYINT         NOT NULL                COMMENT '幸运数字 1~9',
+  `suit`            VARCHAR(200)    NOT NULL                COMMENT '宜（多个用英文逗号分隔）',
+  `avoid`           VARCHAR(200)    NOT NULL                COMMENT '忌（多个用英文逗号分隔）',
+  `fortune_text`    VARCHAR(200)    NOT NULL                COMMENT '运势签文',
+  `created_at`      DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '打卡时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_checkin_user_date` (`user_id`, `checkin_date`),
+  CONSTRAINT `fk_checkin_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '每日打卡表';

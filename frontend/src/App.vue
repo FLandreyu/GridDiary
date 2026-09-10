@@ -3,10 +3,13 @@ import { onBeforeUnmount, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { useUserStore } from "./store/user";
+import { useThemeStore } from "./store/theme";
 import { unreadCount } from "./api/message";
 
 const store = useUserStore();
 const router = useRouter();
+const theme = useThemeStore();
+const logoOk = ref(true);
 
 // 未读私信角标：登录后每 30s 拉取
 const unread = ref(0);
@@ -65,7 +68,15 @@ async function onLogout() {
   <el-container style="min-height: 100%">
     <el-header class="app-header" height="56px">
       <div class="left">
-        <div class="brand" @click="router.push('/')">📔 九宫格记忆网</div>
+        <div class="brand" @click="router.push('/')">
+          <img
+            v-if="logoOk"
+            :src="'/images/logo.png'"
+            alt="logo"
+            @error="logoOk = false"
+          />
+          <span>九宫格记忆网</span>
+        </div>
         <nav v-if="store.isLogin" class="nav">
           <span
             class="nav-item"
@@ -124,6 +135,13 @@ async function onLogout() {
             >注册</el-button
           >
         </template>
+        <button
+          class="gd-theme-btn"
+          :title="theme.isDark ? '切换白天模式' : '切换夜间模式'"
+          @click="theme.toggle()"
+        >
+          {{ theme.isDark ? "🌙" : "☀️" }}
+        </button>
       </div>
     </el-header>
     <el-main>
@@ -140,30 +158,15 @@ async function onLogout() {
 }
 .nav {
   display: flex;
-  gap: 18px;
+  gap: 8px;
 }
+/* 注意：颜色由 styles/theme.css 统一控制（胶囊 + 渐变），这里只留布局 */
 .nav-item {
   cursor: pointer;
-  color: #606266;
-  font-size: 15px;
   position: relative;
-  padding: 4px 0;
 }
-.nav-item:hover {
-  color: #409eff;
-}
-.nav-item.active {
-  color: #409eff;
-  font-weight: 600;
-}
-.nav-item.active::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -2px;
-  height: 2px;
-  border-radius: 2px;
-  background: #409eff;
+.nav-item.msg-item {
+  display: inline-flex;
+  align-items: center;
 }
 </style>

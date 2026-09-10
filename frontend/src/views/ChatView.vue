@@ -132,8 +132,8 @@ onMounted(load);
   height: 52vh;
   overflow-y: auto;
   padding: 4px 6px;
-  background: #f5f7fa;
-  border-radius: 8px;
+  background: var(--gd-surface-soft);
+  border-radius: var(--gd-radius-sm);
   margin-bottom: 12px;
 }
 .msg-row {
@@ -146,12 +146,19 @@ onMounted(load);
 .bubble {
   max-width: 78%;
   padding: 8px 12px;
-  border-radius: 10px;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-radius: 14px;
+  background: var(--gd-surface-solid);
+  border: 1px solid var(--gd-border);
+  box-shadow: 0 4px 14px rgba(20, 16, 60, 0.14);
 }
 .mine .bubble {
-  background: #d9ecff;
+  background: linear-gradient(
+    120deg,
+    rgba(124, 108, 255, 0.92),
+    rgba(255, 122, 189, 0.88)
+  );
+  border: none;
+  color: #fff;
 }
 .msg-text {
   word-break: break-word;
@@ -160,7 +167,7 @@ onMounted(load);
 }
 .msg-time {
   font-size: 11px;
-  color: #909399;
+  color: var(--gd-text-sub);
   margin-top: 4px;
   text-align: right;
 }
