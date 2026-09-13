@@ -158,8 +158,10 @@ html.dark body::before {
 
 /* ---------------- 顶栏 ---------------- */
 .app-header {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 100;
   display: flex;
   align-items: center;
@@ -169,6 +171,84 @@ html.dark body::before {
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--gd-border);
   box-shadow: 0 6px 24px rgba(124, 108, 255, 0.08);
+  transition:
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+/* 柔和渐变遮罩层：透明模式下用它代替“实心条 + 分隔线”，且没有硬边 */
+.app-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(12, 10, 32, 0.5),
+    rgba(12, 10, 32, 0.14) 62%,
+    rgba(12, 10, 32, 0)
+  );
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+/* 首页顶部：顶栏完全透明，与 Hero 插画融为一体 */
+.app-header.hero-mode {
+  background: transparent !important;
+  border-bottom-color: transparent !important;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.app-header.hero-mode::before {
+  opacity: 1;
+}
+/* 透明模式下顶栏文字/控件改白，保证在任意插画上都看得清 */
+.app-header.hero-mode .brand {
+  background: none;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+  color: #fff;
+  text-shadow: 0 2px 10px rgba(10, 8, 30, 0.55);
+}
+.app-header.hero-mode .nav-item {
+  color: rgba(255, 255, 255, 0.86);
+  text-shadow: 0 1px 8px rgba(10, 8, 30, 0.5);
+}
+.app-header.hero-mode .nav-item:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+}
+.app-header.hero-mode .nav-item.active {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 8px 20px rgba(10, 8, 30, 0.28);
+}
+.app-header.hero-mode .gd-theme-btn {
+  border-color: rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  backdrop-filter: blur(8px);
+}
+.app-header.hero-mode .gd-theme-btn:hover {
+  border-color: #fff;
+  color: #fff;
+}
+.app-header.hero-mode .el-tag {
+  background: rgba(255, 255, 255, 0.18) !important;
+  border-color: rgba(255, 255, 255, 0.36) !important;
+  color: #fff !important;
+  backdrop-filter: blur(8px);
+}
+.app-header.hero-mode .el-button {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border-color: rgba(255, 255, 255, 0.36) !important;
+  color: #fff !important;
+  backdrop-filter: blur(8px);
+}
+.app-header.hero-mode .el-button--primary {
+  background: rgba(255, 255, 255, 0.28) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
 }
 .brand {
   display: inline-flex;
@@ -193,6 +273,9 @@ html.dark body::before {
   height: 30px;
   border-radius: 9px;
   object-fit: cover;
+}
+.brand span {
+  white-space: nowrap;
 }
 .nav {
   display: flex;
@@ -246,16 +329,14 @@ html.dark body::before {
 .el-main {
   position: relative;
   z-index: 1;
-  padding: 24px 22px 40px;
+  /* 顶部 80px = 固定顶栏 56px + 原间距 24px（顶栏 fixed 后不再占据文档流）
+     底部 72px 给右下角浮动挂件/回到顶部留出安全区 */
+  padding: 80px 22px 72px;
 }
-.home,
-.my-wrap,
-.hot-wrap,
-.profile-wrap,
+/* 单栏页面容器（首页/排行榜/我的/个人主页/详情页已改用 TwoColLayout 骨架） */
 .msg-wrap,
 .chat-wrap,
-.edit-wrap,
-.detail-wrap {
+.edit-wrap {
   max-width: 1180px;
   margin: 0 auto;
 }
@@ -276,64 +357,141 @@ html.dark body::before {
   font-weight: 700;
 }
 
-/* 首页 Hero */
-.gd-hero {
+/* 首页 Hero：通栏大图横幅（与顶栏/页面背景融合，不做「框框」）
+   注意：本区块必须是 .el-main 的直接子元素才能通栏，
+   负 margin 数值 = .el-main 的 padding（80px 22px 40px），改 padding 要同步改这里 */
+.gd-hero-full {
   position: relative;
+  height: clamp(260px, 38vw, 460px);
+  /* 上边 -80px 让图片一直钻到固定顶栏底下（顶栏透明后才能融为一体） */
+  margin: -80px -22px 26px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 26px 28px;
-  margin-bottom: 22px;
-  border-radius: var(--gd-radius);
-  border: 1px solid var(--gd-border);
+  justify-content: center;
+  text-align: center;
   overflow: hidden;
-  background:
-    linear-gradient(
-      120deg,
-      rgba(124, 108, 255, 0.16),
-      rgba(255, 122, 189, 0.14) 55%,
-      rgba(63, 216, 255, 0.14)
-    ),
-    var(--gd-surface);
-  backdrop-filter: blur(12px);
-  box-shadow: var(--gd-shadow);
+  /* 无边框 / 无圆角 / 无阴影，避免看起来像一张卡片 */
+  background: transparent;
+  animation: gd-fade-up 0.5s ease both;
 }
-.gd-hero-text {
-  position: relative;
-  padding-right: 34px;
-}
-.gd-hero-text::after {
-  content: "✦";
+
+/* 背景层：渐变兜底 + 可选图片 + 压暗层，三者共用一个底部渐隐遮罩，
+   底部自然溶进页面背景；顶部不再淡出（那里已由顶栏的透明遮罩处理） */
+.gd-hero-full .hero-bg {
   position: absolute;
-  right: 0;
-  top: -6px;
-  font-size: 28px;
-  color: rgba(124, 108, 255, 0.35);
-  animation: gd-float 4s ease-in-out infinite;
+  inset: 0;
+  background: linear-gradient(120deg, #6c5ce7 0%, #ff7abd 52%, #3fd8ff 100%);
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 72%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(180deg, #000 0%, #000 72%, transparent 100%);
 }
-html.dark .gd-hero-text::after {
-  color: rgba(196, 190, 255, 0.5);
+.gd-hero-full .hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  animation: gd-hero-zoom 22s ease-in-out infinite alternate;
 }
-.gd-hero h1 {
-  margin: 0 0 8px;
-  font-size: 26px;
-  background: linear-gradient(120deg, var(--gd-primary), var(--gd-primary-2));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+/* 压暗层：中间一块柔光暗斑 + 上下压暗，保证白色标题在任何插画上都清晰 */
+.gd-hero-full .hero-veil {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      62% 70% at 50% 48%,
+      rgba(16, 12, 40, 0.58),
+      rgba(16, 12, 40, 0.12) 62%,
+      rgba(16, 12, 40, 0) 78%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(16, 12, 40, 0.36),
+      rgba(16, 12, 40, 0.08) 42%,
+      rgba(16, 12, 40, 0.44)
+    );
 }
-.gd-hero p {
+
+/* 文字层：不被遮罩影响，始终完整显示；顶部留出固定顶栏高度 */
+.gd-hero-full .hero-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 760px;
+  padding: 56px 24px 10px;
+}
+/* 文字背后再加一层高斯模糊暗晕：无论插画多亮，标题都不会与画面打架，
+   且因为是模糊渐变，看不出任何边界 */
+.gd-hero-full .hero-inner::before {
+  content: "";
+  position: absolute;
+  inset: -34px -90px;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgba(14, 10, 36, 0.55),
+    rgba(14, 10, 36, 0.28) 62%,
+    rgba(14, 10, 36, 0) 100%
+  );
+  filter: blur(26px);
+  pointer-events: none;
+}
+.gd-hero-full .hero-inner h1 {
   margin: 0;
-  color: var(--gd-text-sub);
-  font-size: 14px;
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 800;
+  letter-spacing: 6px;
+  color: #fff;
+  text-shadow:
+    0 2px 6px rgba(10, 8, 30, 0.6),
+    0 12px 38px rgba(10, 8, 30, 0.5);
 }
-.gd-hero-img {
-  width: 150px;
-  max-height: 130px;
-  object-fit: contain;
-  filter: drop-shadow(0 8px 18px rgba(124, 108, 255, 0.28));
-  animation: gd-float 5s ease-in-out infinite;
+.gd-hero-full .hero-inner p {
+  margin: 0;
+  font-size: clamp(13px, 1.4vw, 16px);
+  letter-spacing: 3px;
+  color: rgba(255, 255, 255, 0.94);
+  text-shadow: 0 2px 12px rgba(10, 8, 30, 0.7);
+}
+.gd-hero-full .hero-dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+  white-space: nowrap;
+}
+.gd-hero-full .hero-dots span {
+  padding: 6px 16px;
+  font-size: 12.5px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  backdrop-filter: blur(8px);
+  transition: all 0.22s ease;
+}
+.gd-hero-full .hero-dots span:hover {
+  background: rgba(255, 255, 255, 0.34);
+  transform: translateY(-2px);
+}
+
+@keyframes gd-hero-zoom {
+  from {
+    transform: scale(1.03);
+  }
+  to {
+    transform: scale(1.1);
+  }
 }
 
 @keyframes gd-float {
@@ -447,9 +605,10 @@ html.dark .gd-hero-text::after {
   margin-bottom: 12px;
 }
 .auth-illus img {
-  width: 120px;
-  max-height: 110px;
+  width: 150px;
+  max-height: 140px;
   object-fit: contain;
+  border-radius: 18px;
   filter: drop-shadow(0 10px 20px rgba(124, 108, 255, 0.25));
 }
 .auth-illus .fallback {
@@ -849,14 +1008,850 @@ html.dark .gd-hero-text::after {
   letter-spacing: 0.5px;
 }
 
-/* 窄屏：Hero 改为上下排布 */
+/* 窄屏：Hero 降低高度；打卡卡自适应宽度 */
 @media (max-width: 720px) {
-  .gd-hero {
-    flex-direction: column;
-    align-items: stretch;
+  .gd-hero-full {
+    height: 300px;
+    margin-bottom: 20px;
+  }
+  .gd-hero-full .hero-inner h1 {
+    letter-spacing: 3px;
+  }
+  .gd-hero-full .hero-dots {
+    gap: 6px;
+  }
+  .gd-hero-full .hero-dots span {
+    padding: 4px 10px;
+    font-size: 11.5px;
   }
   .gd-checkin {
     min-width: 0;
     max-width: none;
+  }
+}
+
+/* =========================================================
+   Mizuki 排版扩展：侧边栏卡片 / 横向列表卡 / 浮动挂件
+   ========================================================= */
+
+/* ---------------- 侧边栏通用卡片 ---------------- */
+.gd-panel {
+  padding: 14px 16px 16px;
+  border-radius: var(--gd-radius);
+  border: 1px solid var(--gd-border);
+  background: var(--gd-surface-solid);
+  box-shadow: var(--gd-shadow);
+  animation: gd-fade-up 0.45s ease both;
+}
+.gd-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-size: 14.5px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  color: var(--gd-text);
+}
+.gd-panel-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gd-border), transparent);
+}
+
+/* 站点统计 */
+.gd-stats {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  row-gap: 9px;
+  column-gap: 10px;
+  font-size: 13px;
+}
+.gd-stats .k {
+  color: var(--gd-text-sub);
+  white-space: nowrap;
+}
+.gd-stats .v {
+  color: var(--gd-text);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------- 侧边栏日历 ---------------- */
+.gd-calendar .el-calendar {
+  background: transparent;
+}
+.gd-calendar .el-calendar__header {
+  padding: 0 0 8px;
+  border-bottom: 1px solid var(--gd-border);
+}
+.gd-calendar .el-calendar__title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--gd-text);
+}
+.gd-calendar .el-calendar__body {
+  padding: 8px 0 0;
+}
+.gd-calendar .el-calendar-table thead th {
+  padding: 4px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gd-text-sub);
+}
+.gd-calendar .el-calendar-table td {
+  border: none;
+}
+.gd-calendar .el-calendar-table td.is-selected {
+  background: transparent;
+}
+.gd-calendar .el-calendar-table .el-calendar-day {
+  height: 32px;
+  padding: 0;
+}
+.gd-calendar .el-calendar-table .el-calendar-day:hover {
+  border-radius: 8px;
+  background: var(--gd-surface-soft);
+}
+.gd-calendar .cal-cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: var(--gd-text);
+}
+.gd-calendar .cal-cell.marked {
+  background: rgba(124, 108, 255, 0.14);
+  color: var(--gd-primary);
+  font-weight: 700;
+}
+html.dark .gd-calendar .cal-cell.marked {
+  background: rgba(157, 141, 255, 0.2);
+}
+.gd-calendar .cal-dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+.gd-calendar .cal-cell .cal-dot {
+  position: absolute;
+  left: 50%;
+  bottom: 3px;
+  transform: translateX(-50%);
+}
+.gd-calendar .cal-dot.diary {
+  background: var(--gd-primary);
+}
+.gd-calendar .cal-dot.checkin {
+  background: var(--gd-primary-2);
+}
+.gd-calendar .cal-dot.both {
+  background: linear-gradient(
+    90deg,
+    var(--gd-primary) 50%,
+    var(--gd-primary-2) 50%
+  );
+}
+.gd-calendar .cal-legend {
+  display: flex;
+  gap: 14px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--gd-text-sub);
+}
+.gd-calendar .cal-legend .cal-dot {
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+/* ---------------- 横向列表卡（首页列表视图） ---------------- */
+.gd-item {
+  display: grid;
+  grid-template-columns: 176px minmax(0, 1fr);
+  gap: 16px;
+  padding: 14px;
+  margin-bottom: 16px;
+  border-radius: var(--gd-radius);
+  border: 1px solid var(--gd-border);
+  background: var(--gd-surface);
+  box-shadow: var(--gd-shadow);
+  cursor: pointer;
+  animation: gd-fade-up 0.4s ease both;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+.gd-item:hover {
+  transform: translateY(-4px);
+  border-color: rgba(124, 108, 255, 0.45);
+  box-shadow: var(--gd-shadow-hover);
+}
+.gd-item .item-thumb {
+  height: 118px;
+  border-radius: var(--gd-radius-sm);
+  overflow: hidden;
+  background: var(--gd-surface-soft);
+}
+.gd-item .thumb-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.gd-item .thumb-ph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 44px;
+  background: linear-gradient(
+    135deg,
+    rgba(124, 108, 255, 0.18),
+    rgba(63, 216, 255, 0.16)
+  );
+}
+.gd-item .item-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.gd-item .item-title {
+  margin: 0 0 6px;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--gd-text);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.gd-item .item-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--gd-text-sub);
+}
+.gd-item .item-meta .author {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.gd-item .item-meta .author:hover {
+  color: var(--gd-primary);
+}
+.gd-item .item-meta .dot {
+  font-style: normal;
+}
+.gd-item .item-excerpt {
+  display: -webkit-box;
+  margin: 8px 0 10px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--gd-text-sub);
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.gd-item .gd-chips {
+  margin-top: auto;
+}
+
+/* ---------------- 右下角浮动挂件（默认收起为小圆点，悬停展开） ---------------- */
+.gd-fab {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  /* 收起态只占 40px，不会盖住 300px 的右侧栏 */
+  width: 40px;
+  height: 40px;
+  padding: 6px;
+  overflow: hidden;
+  border: 1px solid var(--gd-border);
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--gd-surface);
+  backdrop-filter: blur(12px);
+  color: var(--gd-text);
+  font-size: 12.5px;
+  font-family: inherit;
+  box-shadow: var(--gd-shadow);
+  transition:
+    width 0.28s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+.gd-fab .fab-text {
+  opacity: 0;
+  white-space: nowrap;
+  transition: opacity 0.18s ease 0.04s;
+}
+.gd-fab:hover {
+  width: 156px;
+  padding: 6px 14px 6px 6px;
+  transform: translateY(-2px);
+  border-color: rgba(124, 108, 255, 0.45);
+  box-shadow: var(--gd-shadow-hover);
+}
+.gd-fab:hover .fab-text {
+  opacity: 1;
+}
+.gd-fab .fab-face {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 15px;
+  background: linear-gradient(120deg, var(--gd-primary), var(--gd-primary-2));
+  box-shadow: 0 6px 14px rgba(124, 108, 255, 0.35);
+  animation: gd-float 4s ease-in-out infinite;
+}
+
+/* ---------------- 窄屏适配 ---------------- */
+@media (max-width: 720px) {
+  .gd-item {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .gd-item .item-thumb {
+    height: 160px;
+  }
+  .gd-fab {
+    padding: 6px;
+  }
+  .gd-fab .fab-text {
+    display: none;
+  }
+  /* 窄屏不展开，保持小圆点 */
+  .gd-fab:hover {
+    width: 40px;
+    padding: 6px;
+  }
+}
+
+/* =========================================================
+   体验优化：响应式顶栏 / 路由过渡 / 页脚 / 骨架屏 / 回到顶部
+   ========================================================= */
+
+/* ---------------- 响应式顶栏（<900px 收进抽屉） ---------------- */
+.gd-menu-btn {
+  display: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--gd-border);
+  background: var(--gd-surface-soft);
+  color: var(--gd-text);
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.22s ease;
+}
+.gd-menu-btn:hover {
+  border-color: var(--gd-primary);
+  color: var(--gd-primary);
+}
+.app-header.hero-mode .gd-menu-btn {
+  border-color: rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+@media (max-width: 900px) {
+  .app-header .nav {
+    display: none !important;
+  }
+  .gd-menu-btn {
+    display: inline-flex;
+  }
+}
+@media (max-width: 720px) {
+  .app-header {
+    padding: 0 14px;
+  }
+  .app-header .user-tag,
+  .app-header .logout-btn {
+    display: none !important;
+  }
+  .brand span {
+    display: none;
+  }
+}
+
+/* 抽屉（移动端菜单） */
+.el-drawer.gd-drawer {
+  background: var(--gd-surface-solid);
+}
+.gd-drawer .el-drawer__body {
+  padding: 20px 16px;
+  color: var(--gd-text);
+}
+
+/* ---------------- 路由切换过渡 ---------------- */
+.gd-page-box {
+  /* flow-root 建立 BFC：既阻止 Hero 的负 margin 向上穿透，又不裁剪它 */
+  display: flow-root;
+}
+.gd-page-enter-active {
+  transition: opacity 0.26s ease;
+}
+.gd-page-leave-active {
+  transition: opacity 0.16s ease;
+}
+.gd-page-enter-from,
+.gd-page-leave-to {
+  opacity: 0;
+}
+/* 内容轻微上浮；只作用在两栏骨架上，不影响 fixed 定位的挂件 */
+.gd-page-enter-active .shell {
+  transition: transform 0.3s ease;
+}
+.gd-page-enter-from .shell {
+  transform: translateY(12px);
+}
+
+/* ---------------- 页脚 ---------------- */
+.app-footer {
+  position: relative;
+  /* 不设 z-index：不要创建层叠上下文，否则 .el-main(z-index:1) 内 fixed 定位的
+     浮动挂件会被页脚盖住；靠 DOM 顺序即可胜过 body::before 的网格装饰 */
+  /* 固定挂件已收成 40px 小圆点，页脚不需要再额外留白 */
+  padding: 26px 22px 24px;
+  background: var(--gd-surface);
+  border-top: 1px solid var(--gd-border);
+  backdrop-filter: blur(12px);
+}
+.ft-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1.2fr;
+  gap: 24px;
+}
+.ft-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  color: var(--gd-text);
+}
+.ft-logo img {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+}
+.ft-brand p {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--gd-text-sub);
+}
+.ft-title {
+  margin-bottom: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gd-text);
+}
+.ft-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+}
+.ft-link {
+  font-size: 13px;
+  color: var(--gd-text-sub);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.ft-link:hover {
+  color: var(--gd-primary);
+}
+.ft-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ft-tags span {
+  padding: 3px 10px;
+  font-size: 12px;
+  border-radius: 999px;
+  color: var(--gd-text-sub);
+  background: var(--gd-surface-soft);
+  border: 1px solid var(--gd-border);
+}
+.ft-bottom {
+  max-width: 1180px;
+  margin: 20px auto 0;
+  padding-top: 14px;
+  border-top: 1px dashed var(--gd-border);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--gd-text-sub);
+}
+
+/* ---------------- 骨架屏 ---------------- */
+.sk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+.sk-card {
+  overflow: hidden;
+  border-radius: var(--gd-radius);
+  border: 1px solid var(--gd-border);
+  background: var(--gd-surface-solid);
+}
+.sk-body {
+  padding: 10px 12px 14px;
+}
+.sk-item {
+  margin-bottom: 16px;
+  padding: 14px;
+  border-radius: var(--gd-radius);
+  border: 1px solid var(--gd-border);
+  background: var(--gd-surface-solid);
+}
+.sk-item-inner {
+  display: grid;
+  grid-template-columns: 176px minmax(0, 1fr);
+  gap: 16px;
+}
+.sk-item-body {
+  min-width: 0;
+}
+.sk-row {
+  padding: 12px 6px;
+  border-bottom: 1px solid var(--gd-border);
+}
+.sk-row:last-child {
+  border-bottom: none;
+}
+.sk-row-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ---------------- 空状态：统一缩小插图 ---------------- */
+.el-empty {
+  padding: 20px 0;
+}
+.el-empty__image {
+  width: 88px !important;
+  height: 88px !important;
+}
+.el-empty__description {
+  margin-top: 4px;
+}
+.el-empty__description p {
+  font-size: 13.5px;
+  color: var(--gd-text-sub);
+}
+
+/* ---------------- 回到顶部 ---------------- */
+.el-backtop {
+  --el-backtop-bg-color: var(--gd-surface-solid);
+  --el-backtop-text-color: var(--gd-primary);
+  --el-backtop-hover-bg-color: var(--gd-surface-soft);
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--gd-border);
+  box-shadow: var(--gd-shadow);
+  backdrop-filter: blur(10px);
+}
+
+/* ---------------- 窄屏适配 ---------------- */
+@media (max-width: 720px) {
+  .ft-inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+  .ft-bottom {
+    justify-content: center;
+    text-align: center;
+  }
+  .sk-item-inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sk-item-inner > .el-skeleton__item:first-child,
+  .sk-item-inner .el-skeleton > .el-skeleton__item:first-child {
+    width: 100% !important;
+    height: 160px !important;
+  }
+}
+
+/* =========================================================
+   分类 / 标签（Mizuki 卡片 meta 行的最后一块拼图）
+   ========================================================= */
+
+/* 卡片与详情页的标签行 */
+.gd-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 6px;
+}
+.gd-tag,
+.gd-cat {
+  padding: 2px 9px;
+  font-size: 11.5px;
+  line-height: 1.7;
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+.gd-tag {
+  cursor: pointer;
+  color: var(--gd-primary);
+  background: rgba(124, 108, 255, 0.12);
+  border: 1px solid rgba(124, 108, 255, 0.22);
+}
+.gd-tag:hover {
+  color: #fff;
+  background: linear-gradient(120deg, var(--gd-primary), var(--gd-primary-2));
+  border-color: transparent;
+}
+html.dark .gd-tag {
+  background: rgba(157, 141, 255, 0.16);
+  border-color: rgba(157, 141, 255, 0.3);
+}
+.gd-cat {
+  color: var(--gd-text-sub);
+  background: var(--gd-surface-soft);
+  border: 1px solid var(--gd-border);
+}
+/* 卡片里字数靠右对齐，形成「分类 · 标签 …… 字数」的 meta 行 */
+.gd-words {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--gd-text-sub);
+  white-space: nowrap;
+}
+.gd-item .gd-words {
+  margin-left: 0;
+}
+
+/* 侧边栏标签云 */
+.gd-tagcloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.tag-cloud-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--gd-text-sub);
+  background: var(--gd-surface-soft);
+  border: 1px solid var(--gd-border);
+  transition: all 0.2s ease;
+}
+.tag-cloud-item i {
+  font-style: normal;
+  font-size: 10.5px;
+  opacity: 0.7;
+}
+.tag-cloud-item.sm {
+  font-size: 12px;
+}
+.tag-cloud-item.md {
+  font-size: 13.5px;
+  color: var(--gd-text);
+}
+.tag-cloud-item.lg {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gd-primary);
+}
+.tag-cloud-item:hover,
+.tag-cloud-item.active {
+  transform: translateY(-2px);
+  color: #fff;
+  background: linear-gradient(120deg, var(--gd-primary), var(--gd-primary-2));
+  border-color: transparent;
+}
+.tag-cloud-item:hover i,
+.tag-cloud-item.active i {
+  opacity: 0.9;
+}
+.tag-cloud-empty {
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--gd-text-sub);
+}
+
+/* ---------------- 详情页「关于作者」卡 ---------------- */
+.author-card .ac-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.author-card .ac-info {
+  min-width: 0;
+}
+.author-card .ac-nick {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gd-text);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.author-card .ac-uname {
+  margin-top: 3px;
+  font-size: 12.5px;
+  color: var(--gd-text-sub);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.author-card .ac-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 14px 0;
+  padding: 12px 0;
+  border-top: 1px solid var(--gd-border);
+  border-bottom: 1px solid var(--gd-border);
+  text-align: center;
+}
+.author-card .ac-stats b {
+  display: block;
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+  color: var(--gd-primary);
+}
+.author-card .ac-stats span {
+  font-size: 11.5px;
+  color: var(--gd-text-sub);
+}
+.author-card .ac-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.author-card .ac-actions .el-button {
+  flex: 1;
+  margin-left: 0 !important;
+}
+.author-card .ac-join {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--gd-text-sub);
+}
+
+/* 个人主页资料卡的统计行 */
+.ustats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: var(--gd-text-sub);
+}
+.ustats b {
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  color: var(--gd-primary);
+  margin-right: 2px;
+}
+
+/* =========================================================
+   相册页 /gallery：瀑布流（CSS 多列实现，图片高度自适应）
+   ========================================================= */
+.gallery-grid {
+  column-count: 3;
+  column-gap: 16px;
+}
+.gallery-item {
+  position: relative;
+  /* break-inside 避免一张图被拆到两列 */
+  break-inside: avoid;
+  margin: 0 0 16px;
+  border-radius: var(--gd-radius);
+  border: 1px solid var(--gd-border);
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--gd-surface-soft);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+.gallery-item:hover {
+  transform: translateY(-4px);
+  border-color: rgba(124, 108, 255, 0.45);
+  box-shadow: var(--gd-shadow-hover);
+}
+.gallery-item img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.gallery-cap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 26px 12px 10px;
+  background: linear-gradient(180deg, transparent, rgba(14, 10, 36, 0.78));
+  color: #fff;
+  transition: opacity 0.22s ease;
+}
+.gc-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-shadow: 0 2px 8px rgba(10, 8, 30, 0.5);
+}
+.gc-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 5px;
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.86);
+}
+.gc-meta i {
+  font-style: normal;
+  opacity: 0.7;
+}
+.gallery-count {
+  font-size: 13px;
+  color: var(--gd-text-sub);
+}
+@media (max-width: 1100px) {
+  .gallery-grid {
+    column-count: 2;
+  }
+}
+@media (max-width: 700px) {
+  .gallery-grid {
+    column-count: 1;
   }
 }

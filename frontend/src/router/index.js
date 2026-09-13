@@ -47,6 +47,11 @@ const routes = [
     component: () => import("../views/HotView.vue"),
   },
   {
+    path: "/gallery",
+    name: "gallery",
+    component: () => import("../views/GalleryView.vue"),
+  },
+  {
     path: "/user/:id",
     name: "user-profile",
     component: () => import("../views/UserProfileView.vue"),

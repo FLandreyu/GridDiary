@@ -6,6 +6,7 @@ import com.flandreyu.dto.LoginRequest;
 import com.flandreyu.dto.RegisterRequest;
 import com.flandreyu.dto.ResetPasswordRequest;
 import com.flandreyu.dto.UpdateProfileRequest;
+import com.flandreyu.vo.UserStatsVO;
 import com.flandreyu.vo.UserVO;
 
 import jakarta.servlet.http.HttpSession;
@@ -29,6 +30,9 @@ public interface UserService {
 
     /** 公开资料（个人主页，按用户ID查询） */
     UserVO profile(long id);
+
+    /** 作品统计（公开日记数 / 获赞 / 收到评论 / 注册天数） */
+    UserStatsVO stats(long id);
 
     /** 修改个人资料（昵称/头像），返回最新用户信息 */
     UserVO updateProfile(long userId, UpdateProfileRequest req);

@@ -23,6 +23,14 @@ public class DiarySaveRequest {
     /** 是否公开，默认 true */
     private Boolean isPublic;
 
+    /** 分类（单选，可为空，最多 50 字） */
+    @Size(max = 50, message = "分类长度不能超过 50")
+    private String category;
+
+    /** 标签（最多 5 个，单个不超过 20 字；服务层会 trim / 去重 / 去空） */
+    @Size(max = 5, message = "标签最多 5 个")
+    private List<String> tags;
+
     /** 图片列表（按顺序展示），可为空 */
     @Valid
     private List<ImageItemRequest> images;

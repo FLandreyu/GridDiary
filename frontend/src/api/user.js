@@ -14,6 +14,9 @@ export const forgotPassword = (email) =>
 export const resetPassword = (data) =>
   request.post("/api/user/reset-password", data).then(payload);
 export const getProfile = (id) => request.get(`/api/user/${id}`).then(payload);
+/** 某用户的作品统计：{ postCount, likeCount, commentCount, joinDays, createdAt } */
+export const getUserStats = (id) =>
+  request.get(`/api/user/${id}/stats`).then(payload);
 export const updateProfile = (data) =>
   request.put("/api/user/profile", data).then(payload);
 export const changePassword = (data) =>

@@ -21,6 +21,11 @@ public interface CheckinMapper {
     /** 查询某用户最近的打卡日期（倒序，用于计算连续天数） */
     List<LocalDate> findRecentDates(@Param("userId") Long userId, @Param("limit") int limit);
 
+    /** 某用户指定区间内已打卡的日期（from 含、to 不含，日历打点用） */
+    List<LocalDate> findDatesBetween(@Param("userId") Long userId,
+            @Param("from") LocalDate from,
+            @Param("to") LocalDate to);
+
     /** 某用户累计打卡天数 */
     long countByUser(Long userId);
 }

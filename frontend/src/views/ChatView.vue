@@ -5,6 +5,8 @@ import { ElMessage } from "element-plus";
 import { chatWith, sendMessage } from "../api/message";
 import { useUserStore } from "../store/user";
 import { formatTime } from "../utils/format";
+import AppSidebar from "../components/AppSidebar.vue";
+import TwoColLayout from "../components/TwoColLayout.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -58,16 +60,12 @@ onMounted(load);
 </script>
 
 <template>
-  <div class="chat-wrap">
-    <el-card v-loading="loading" class="chat-card">
-      <template #header>
-        <div class="hd">
-          <el-button link @click="router.push('/message')"
-            >← 返回会话</el-button
-          >
-          <span class="nick">{{ peer?.peerNickname }}</span>
-        </div>
-      </template>
+  <TwoColLayout>
+    <div class="gd-panel chat-card">
+      <div class="hd">
+        <el-button link @click="router.push('/message')">← 返回会话</el-button>
+        <span class="nick">{{ peer?.peerNickname }}</span>
+      </div>
 
       <div ref="scrollBox" class="chat-body">
         <el-empty
@@ -107,15 +105,15 @@ onMounted(load);
           发送
         </el-button>
       </div>
-    </el-card>
-  </div>
+    </div>
+
+    <template #aside>
+      <AppSidebar />
+    </template>
+  </TwoColLayout>
 </template>
 
 <style scoped>
-.chat-wrap {
-  max-width: 640px;
-  margin: 0 auto;
-}
 .chat-card {
   display: flex;
   flex-direction: column;
@@ -124,6 +122,7 @@ onMounted(load);
   display: flex;
   align-items: center;
   gap: 12px;
+  margin-bottom: 12px;
 }
 .hd .nick {
   font-weight: 700;

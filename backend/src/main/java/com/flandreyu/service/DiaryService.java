@@ -5,6 +5,7 @@ import java.util.List;
 import com.flandreyu.common.PageResult;
 import com.flandreyu.dto.DiarySaveRequest;
 import com.flandreyu.vo.DiaryVO;
+import com.flandreyu.vo.GalleryImageVO;
 
 /**
  * 日记模块业务接口
@@ -16,14 +17,18 @@ public interface DiaryService {
      *
      * @param userId  非空则只看该用户的公开日记
      * @param keyword 非空则按标题/正文搜索
+     * @param tag     非空则只查带该标签的日记
      */
-    PageResult<DiaryVO> pagePublic(int page, int size, Long userId, String keyword);
+    PageResult<DiaryVO> pagePublic(int page, int size, Long userId, String keyword, String tag);
 
     /** 分页查询某用户自己的全部日记（含私密） */
     PageResult<DiaryVO> pageMine(long userId, int page, int size);
 
     /** 热门日记排行榜（仅公开，按点赞数） */
     List<DiaryVO> hot(int limit);
+
+    /** 相册：分页获取公开日记的图片（含日记标题与作者） */
+    PageResult<GalleryImageVO> gallery(int page, int size);
 
     /**
      * 日记详情（含图片列表）。

@@ -34,18 +34,20 @@ public class DiaryController {
 
     private final DiaryService diaryService;
 
-    /** 首页/搜索/他人公开日记（分页） */
+    /** 首页/搜索/他人公开日记（分页，支持按标签筛选） */
     @GetMapping
     @PublicApi
     public Result<PageResult<DiaryVO>> list(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "12") int size,
             @RequestParam(required = false) Long userId,
-            @RequestParam(required = false) String keyword) {
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String tag) {
         int safePage = Math.max(1, page);
         int safeSize = Math.min(Math.max(1, size), 100);
         String kw = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
-        return Result.ok(diaryService.pagePublic(safePage, safeSize, userId, kw));
+        String tg = (tag == null || tag.isBlank()) ? null : tag.trim();
+        return Result.ok(diaryService.pagePublic(safePage, safeSize, userId, kw, tg));
     }
 
     /** 我的日记（含私密，需登录） */
@@ -64,6 +66,17 @@ public class DiaryController {
     @PublicApi
     public Result<java.util.List<DiaryVO>> hot(@RequestParam(defaultValue = "10") int limit) {
         return Result.ok(diaryService.hot(Math.min(Math.max(1, limit), 50)));
+    }
+
+    /** 相册：公开日记的图片流（分页，含日记标题与作者） */
+    @GetMapping("/gallery")
+    @PublicApi
+    public Result<PageResult<com.flandreyu.vo.GalleryImageVO>> gallery(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "24") int size) {
+        int safePage = Math.max(1, page);
+        int safeSize = Math.min(Math.max(1, size), 60);
+        return Result.ok(diaryService.gallery(safePage, safeSize));
     }
 
     /** 日记详情（公开可看，私密仅作者） */

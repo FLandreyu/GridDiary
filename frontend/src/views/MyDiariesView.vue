@@ -3,7 +3,10 @@ import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { listMyDiaries, deleteDiary } from "../api/diary";
+import AppSidebar from "../components/AppSidebar.vue";
 import DiaryCard from "../components/DiaryCard.vue";
+import SkeletonCards from "../components/SkeletonCards.vue";
+import TwoColLayout from "../components/TwoColLayout.vue";
 import { useUserStore } from "../store/user";
 
 const store = useUserStore();
@@ -67,7 +70,7 @@ onMounted(() => load(1));
 </script>
 
 <template>
-  <div class="my-wrap">
+  <TwoColLayout>
     <div class="toolbar">
       <h2 class="section-title">🗂️ 我的日记</h2>
       <div>
@@ -76,40 +79,42 @@ onMounted(() => load(1));
       </div>
     </div>
 
-    <div v-loading="loading">
-      <div v-if="records.length" class="grid">
-        <div v-for="d in records" :key="d.id" class="cell">
-          <DiaryCard :diary="d" />
-          <div class="ops">
-            <el-tag
-              :type="d.isPublic ? 'success' : 'info'"
-              size="small"
-              class="pub"
-            >
-              {{ d.isPublic ? "公开" : "仅自己" }}
-            </el-tag>
-            <div>
-              <el-button
+    <div v-loading="loading && records.length > 0">
+      <SkeletonCards v-if="loading && !records.length" type="grid" :count="6" />
+
+      <template v-else-if="records.length">
+        <div class="grid">
+          <div v-for="d in records" :key="d.id" class="cell">
+            <DiaryCard :diary="d" />
+            <div class="ops">
+              <el-tag
+                :type="d.isPublic ? 'success' : 'info'"
                 size="small"
-                text
-                type="primary"
-                @click="router.push(`/diary/${d.id}`)"
-                >查看</el-button
+                class="pub"
               >
-              <el-button size="small" text type="primary" @click="goEdit(d)"
-                >编辑</el-button
-              >
-              <el-button size="small" text type="danger" @click="onDelete(d)"
-                >删除</el-button
-              >
+                {{ d.isPublic ? "公开" : "仅自己" }}
+              </el-tag>
+              <div>
+                <el-button
+                  size="small"
+                  text
+                  type="primary"
+                  @click="router.push(`/diary/${d.id}`)"
+                  >查看</el-button
+                >
+                <el-button size="small" text type="primary" @click="goEdit(d)"
+                  >编辑</el-button
+                >
+                <el-button size="small" text type="danger" @click="onDelete(d)"
+                  >删除</el-button
+                >
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <el-empty
-        v-else-if="!loading"
-        description="还没有日记，点右上角写第一篇吧 🖊️"
-      />
+      </template>
+
+      <el-empty v-else description="还没有日记，点右上角写第一篇吧 🖊️" />
     </div>
 
     <div v-if="total > size" class="pager">
@@ -122,14 +127,14 @@ onMounted(() => load(1));
         @current-change="onPage"
       />
     </div>
-  </div>
+
+    <template #aside>
+      <AppSidebar />
+    </template>
+  </TwoColLayout>
 </template>
 
 <style scoped>
-.my-wrap {
-  max-width: 1200px;
-  margin: 0 auto;
-}
 .toolbar {
   display: flex;
   align-items: center;

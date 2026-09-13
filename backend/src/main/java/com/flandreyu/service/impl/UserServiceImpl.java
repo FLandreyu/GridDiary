@@ -19,6 +19,7 @@ import com.flandreyu.dto.UpdateProfileRequest;
 import com.flandreyu.entity.User;
 import com.flandreyu.mapper.UserMapper;
 import com.flandreyu.service.UserService;
+import com.flandreyu.vo.UserStatsVO;
 import com.flandreyu.vo.UserVO;
 
 import jakarta.servlet.http.HttpSession;
@@ -116,14 +117,25 @@ public class UserServiceImpl implements UserService {
         resetStore.remove(req.getEmail());
     }
 
-    /** 公开资料（个人主页） */
+    /** 公开资料（个人主页）：不返回邮箱，避免泄露 */
     @Override
     public UserVO profile(long id) {
         User user = userMapper.findById(id);
         if (user == null) {
             throw new BusinessException(404, "用户不存在");
         }
-        return toVO(user);
+        UserVO vo = toVO(user);
+        vo.setEmail(null);
+        return vo;
+    }
+
+    /** 作品统计（详情页作者卡 / 个人主页用） */
+    @Override
+    public UserStatsVO stats(long id) {
+        if (userMapper.findById(id) == null) {
+            throw new BusinessException(404, "用户不存在");
+        }
+        return userMapper.selectStats(id);
     }
 
     /** 修改个人资料（昵称/头像） */

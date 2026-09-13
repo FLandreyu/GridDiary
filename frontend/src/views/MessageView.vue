@@ -3,6 +3,9 @@ import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { conversations } from "../api/message";
 import { timeAgo } from "../utils/format";
+import AppSidebar from "../components/AppSidebar.vue";
+import SkeletonCards from "../components/SkeletonCards.vue";
+import TwoColLayout from "../components/TwoColLayout.vue";
 
 const router = useRouter();
 const loading = ref(false);
@@ -21,52 +24,60 @@ onMounted(load);
 </script>
 
 <template>
-  <div class="msg-wrap">
-    <el-card>
-      <template #header>
-        <div class="hd">
-          <b>💬 私信会话</b>
-          <el-button size="small" @click="load">刷新</el-button>
-        </div>
-      </template>
+  <TwoColLayout>
+    <div class="gd-panel">
+      <div class="hd">
+        <div class="gd-panel-title">💬 私信会话</div>
+        <el-button size="small" @click="load">刷新</el-button>
+      </div>
 
-      <div v-loading="loading">
-        <div
-          v-for="c in list"
-          :key="c.peerId"
-          class="row"
-          @click="router.push(`/message/chat/${c.peerId}`)"
-        >
-          <el-avatar :size="44" :src="c.peerAvatar || undefined">
-            {{ (c.peerNickname || "?").charAt(0).toUpperCase() }}
-          </el-avatar>
-          <div class="info">
-            <div class="top">
-              <span class="nick">{{ c.peerNickname }}</span>
-              <span class="time">{{ timeAgo(c.lastTime) }}</span>
+      <div v-loading="loading && list.length > 0">
+        <SkeletonCards v-if="loading && !list.length" type="row" :count="4" />
+
+        <template v-else-if="list.length">
+          <div
+            v-for="c in list"
+            :key="c.peerId"
+            class="row"
+            @click="router.push(`/message/chat/${c.peerId}`)"
+          >
+            <el-avatar :size="44" :src="c.peerAvatar || undefined">
+              {{ (c.peerNickname || "?").charAt(0).toUpperCase() }}
+            </el-avatar>
+            <div class="info">
+              <div class="top">
+                <span class="nick">{{ c.peerNickname }}</span>
+                <span class="time">{{ timeAgo(c.lastTime) }}</span>
+              </div>
+              <div class="last">{{ c.lastContent || "（无内容）" }}</div>
             </div>
-            <div class="last">{{ c.lastContent || "（无内容）" }}</div>
+            <el-badge v-if="c.unread > 0" :value="c.unread" :max="99" />
           </div>
-          <el-badge v-if="c.unread > 0" :value="c.unread" :max="99" />
-        </div>
+        </template>
+
         <el-empty
-          v-if="!loading && !list.length"
+          v-else
           description="还没有任何私信，去别人的主页打个招呼吧～"
         />
       </div>
-    </el-card>
-  </div>
+    </div>
+
+    <template #aside>
+      <AppSidebar />
+    </template>
+  </TwoColLayout>
 </template>
 
 <style scoped>
-.msg-wrap {
-  max-width: 640px;
-  margin: 0 auto;
+.hd .gd-panel-title {
+  flex: 1;
+  margin-bottom: 0;
 }
 .hd {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 12px;
 }
 .row {
   display: flex;

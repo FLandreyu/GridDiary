@@ -20,6 +20,10 @@ public class Diary {
     private String cover;
     /** 是否公开：true公开 / false仅自己 */
     private Boolean isPublic;
+    /** 分类（单选，可为空） */
+    private String category;
+    /** 标签，逗号分隔存库（最多 5 个） */
+    private String tags;
     /** 点赞数（冗余计数） */
     private Integer likeCount;
     /** 发布时间 */

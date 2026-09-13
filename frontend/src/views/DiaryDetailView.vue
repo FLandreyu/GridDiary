@@ -12,7 +12,10 @@ import {
   likeStatus,
 } from "../api/social";
 import { useUserStore } from "../store/user";
-import { formatTime, timeAgo } from "../utils/format";
+import { formatTime, timeAgo, toTagList, wordCountText } from "../utils/format";
+import AppSidebar from "../components/AppSidebar.vue";
+import AuthorCard from "../components/AuthorCard.vue";
+import TwoColLayout from "../components/TwoColLayout.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -45,6 +48,8 @@ const isOwner = computed(
 );
 
 const images = computed(() => diary.value?.images || []);
+/** 标签列表（后端存逗号串，这里拆成数组） */
+const tagList = computed(() => toTagList(diary.value?.tags));
 const currentImage = computed(() =>
   previewIndex.value >= 0 && previewIndex.value < images.value.length
     ? images.value[previewIndex.value]
@@ -208,7 +213,7 @@ async function onDeleteDiary() {
 </script>
 
 <template>
-  <div class="detail-wrap">
+  <TwoColLayout>
     <el-card v-loading="loading">
       <template #header>
         <el-button link @click="router.back()">← 返回</el-button>
@@ -260,9 +265,24 @@ async function onDeleteDiary() {
           <span class="gd-chip hot">♥ {{ likeCount }}</span>
           <span class="gd-chip">🖼 {{ images.length }} 张图</span>
           <span class="gd-chip">💬 {{ commentCount }} 条评论</span>
+          <span v-if="diary.category" class="gd-chip">
+            📂 {{ diary.category }}
+          </span>
+          <span class="gd-chip">✍️ {{ wordCountText(diary.wordCount) }}</span>
           <span class="gd-chip">
             {{ diary.isPublic ? "🌐 公开" : "🔒 仅自己可见" }}
           </span>
+        </div>
+
+        <!-- 标签 -->
+        <div v-if="tagList.length" class="gd-tags">
+          <span
+            v-for="t in tagList"
+            :key="t"
+            class="gd-tag"
+            @click="$router.push({ path: '/', query: { tag: t } })"
+            >#{{ t }}</span
+          >
         </div>
 
         <!-- 点赞 -->
@@ -271,6 +291,12 @@ async function onDeleteDiary() {
             round
             :type="liked ? 'danger' : 'default'"
             :loading="liking"
+            :aria-pressed="liked"
+            :aria-label="
+              liked
+                ? `取消点赞，当前 ${likeCount} 个赞`
+                : `点赞，当前 ${likeCount} 个赞`
+            "
             @click="toggleLike"
           >
             <template #icon>
@@ -462,14 +488,22 @@ async function onDeleteDiary() {
         </div>
       </template>
     </el-dialog>
-  </div>
+
+    <template #aside>
+      <!-- 页面专属卡：作者卡放在统计/标签云/日历之前 -->
+      <AppSidebar>
+        <AuthorCard
+          v-if="diary"
+          :user-id="diary.userId"
+          :nickname="diary.authorNickname"
+          :avatar="diary.authorAvatar"
+        />
+      </AppSidebar>
+    </template>
+  </TwoColLayout>
 </template>
 
 <style scoped>
-.detail-wrap {
-  max-width: 860px;
-  margin: 0 auto;
-}
 .title {
   margin: 0 0 12px;
   font-size: 24px;

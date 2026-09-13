@@ -2,9 +2,11 @@
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { listDiaries } from "../api/diary";
-import { getProfile } from "../api/user";
+import { getProfile, getUserStats } from "../api/user";
 import { useUserStore } from "../store/user";
+import AppSidebar from "../components/AppSidebar.vue";
 import DiaryCard from "../components/DiaryCard.vue";
+import TwoColLayout from "../components/TwoColLayout.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -12,6 +14,7 @@ const store = useUserStore();
 
 const userId = computed(() => Number(route.params.id));
 const user = ref(null);
+const stats = ref(null);
 const records = ref([]);
 const total = ref(0);
 const page = ref(1);
@@ -25,11 +28,13 @@ async function load() {
   loading.value = true;
   notFound.value = false;
   try {
-    const [u, res] = await Promise.all([
+    const [u, s, res] = await Promise.all([
       getProfile(userId.value),
+      getUserStats(userId.value),
       listDiaries({ userId: userId.value, page: 1, size }),
     ]);
     user.value = u;
+    stats.value = s;
     records.value = res.records || [];
     total.value = res.total || 0;
   } catch (e) {
@@ -50,7 +55,7 @@ onMounted(() => {});
 </script>
 
 <template>
-  <div class="profile-wrap">
+  <TwoColLayout>
     <el-card v-loading="loading">
       <template v-if="notFound">
         <el-empty description="该用户不存在" />
@@ -63,6 +68,20 @@ onMounted(() => {});
           <div class="uinfo">
             <div class="nick">{{ user.nickname }}</div>
             <div class="uname">@{{ user.username }}</div>
+            <div class="ustats">
+              <span
+                ><b>{{ stats?.postCount ?? 0 }}</b> 公开日记</span
+              >
+              <span
+                ><b>{{ stats?.likeCount ?? 0 }}</b> 获赞</span
+              >
+              <span
+                ><b>{{ stats?.commentCount ?? 0 }}</b> 收到评论</span
+              >
+              <span
+                >加入 <b>{{ stats?.joinDays ?? 1 }}</b> 天</span
+              >
+            </div>
           </div>
           <el-button v-if="isSelf" round @click="router.push('/profile/edit')">
             ⚙️ 编辑资料
@@ -90,14 +109,14 @@ onMounted(() => {});
         :image-size="60"
       />
     </div>
-  </div>
+
+    <template #aside>
+      <AppSidebar />
+    </template>
+  </TwoColLayout>
 </template>
 
 <style scoped>
-.profile-wrap {
-  max-width: 1200px;
-  margin: 0 auto;
-}
 .head {
   display: flex;
   align-items: center;
