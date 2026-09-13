@@ -14,7 +14,9 @@ import com.flandreyu.entity.DiaryImage;
 import com.flandreyu.mapper.DiaryImageMapper;
 import com.flandreyu.mapper.DiaryMapper;
 import com.flandreyu.service.DiaryService;
+import com.flandreyu.util.TagUtil;
 import com.flandreyu.vo.DiaryVO;
+import com.flandreyu.vo.GalleryImageVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,13 +31,13 @@ public class DiaryServiceImpl implements DiaryService {
     private final DiaryImageMapper diaryImageMapper;
 
     @Override
-    public PageResult<DiaryVO> pagePublic(int page, int size, Long userId, String keyword) {
-        long total = diaryMapper.countPage(userId, keyword);
+    public PageResult<DiaryVO> pagePublic(int page, int size, Long userId, String keyword, String tag) {
+        long total = diaryMapper.countPage(userId, keyword, tag);
         if (total == 0) {
             return new PageResult<>(0, List.of());
         }
         int offset = (page - 1) * size;
-        return new PageResult<>(total, diaryMapper.selectPage(offset, size, userId, keyword));
+        return new PageResult<>(total, diaryMapper.selectPage(offset, size, userId, keyword, tag));
     }
 
     @Override
@@ -51,6 +53,16 @@ public class DiaryServiceImpl implements DiaryService {
     @Override
     public List<DiaryVO> hot(int limit) {
         return diaryMapper.selectHot(limit);
+    }
+
+    @Override
+    public PageResult<GalleryImageVO> gallery(int page, int size) {
+        long total = diaryImageMapper.countGallery();
+        if (total == 0) {
+            return new PageResult<>(0, List.of());
+        }
+        int offset = (page - 1) * size;
+        return new PageResult<>(total, diaryImageMapper.selectGalleryPage(offset, size));
     }
 
     @Override
@@ -79,6 +91,8 @@ public class DiaryServiceImpl implements DiaryService {
         diary.setTitle(req.getTitle());
         diary.setContent(req.getContent());
         diary.setIsPublic(req.getIsPublic() == null || req.getIsPublic());
+        diary.setCategory(normalizeCategory(req.getCategory()));
+        diary.setTags(TagUtil.join(req.getTags()));
         diary.setCover(firstCover(images));
         diaryMapper.insert(diary);
 
@@ -104,6 +118,8 @@ public class DiaryServiceImpl implements DiaryService {
         diary.setContent(req.getContent());
         // 未传 isPublic 时保持原状
         diary.setIsPublic(req.getIsPublic() != null ? req.getIsPublic() : exist.getIsPublic());
+        diary.setCategory(normalizeCategory(req.getCategory()));
+        diary.setTags(TagUtil.join(req.getTags()));
         diary.setCover(firstCover(images));
         diaryMapper.updateFull(diary);
 
@@ -124,6 +140,18 @@ public class DiaryServiceImpl implements DiaryService {
         }
         // 图片/评论/点赞由外键级联删除
         diaryMapper.deleteById(id);
+    }
+
+    /** 分类：trim 后为空则存 null，最长 50 字 */
+    private String normalizeCategory(String category) {
+        if (category == null) {
+            return null;
+        }
+        String c = category.trim();
+        if (c.isEmpty()) {
+            return null;
+        }
+        return c.length() > 50 ? c.substring(0, 50) : c;
     }
 
     /** 空列表 -> 空集合，避免 null */

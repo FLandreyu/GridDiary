@@ -4,6 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { getDiary, createDiary, updateDiary } from "../api/diary";
 import { uploadImages } from "../api/upload";
+import { toTagList } from "../utils/format";
 
 const route = useRoute();
 const router = useRouter();
@@ -15,6 +16,35 @@ const saving = ref(false);
 const title = ref("");
 const content = ref("");
 const isPublic = ref(true);
+
+/* 分类（单选，可自定义）+ 标签（多选，可自定义，最多 5 个） */
+const CATEGORIES = [
+  "生活",
+  "心情",
+  "技术",
+  "学习",
+  "旅行",
+  "美食",
+  "工作",
+  "其他",
+];
+const TAG_PRESETS = [
+  "日常",
+  "心情",
+  "旅行",
+  "美食",
+  "读书",
+  "电影",
+  "音乐",
+  "运动",
+  "摄影",
+  "Vue",
+  "学习",
+  "工作",
+];
+const MAX_TAGS = 5;
+const category = ref("");
+const tags = ref([]);
 
 /**
  * 图片列表：
@@ -34,6 +64,8 @@ onMounted(async () => {
     title.value = d.title;
     content.value = d.content || "";
     isPublic.value = d.isPublic !== false;
+    category.value = d.category || "";
+    tags.value = toTagList(d.tags);
     images.value = (d.images || []).map((im) => ({
       originalUrl: im.originalUrl,
       thumbUrl: im.thumbUrl,
@@ -108,6 +140,8 @@ async function submit() {
       title: title.value.trim(),
       content: content.value,
       isPublic: isPublic.value,
+      category: category.value ? category.value.trim() : null,
+      tags: tags.value.map((t) => String(t).trim()).filter(Boolean),
       images: finalImages,
     };
     // 3) 保存
@@ -151,6 +185,40 @@ async function submit() {
             :rows="7"
             placeholder="记录今天的心情 / 见闻 / 想法……"
           />
+        </el-form-item>
+
+        <el-form-item label="分类">
+          <el-select
+            v-model="category"
+            clearable
+            filterable
+            allow-create
+            default-first-option
+            placeholder="选一个分类，也可直接输入自定义"
+            style="width: 240px"
+          >
+            <el-option v-for="c in CATEGORIES" :key="c" :label="c" :value="c" />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="标签">
+          <el-select
+            v-model="tags"
+            multiple
+            filterable
+            allow-create
+            default-first-option
+            :multiple-limit="MAX_TAGS"
+            placeholder="最多 5 个，回车即创建新标签"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="t in TAG_PRESETS"
+              :key="t"
+              :label="t"
+              :value="t"
+            />
+          </el-select>
         </el-form-item>
 
         <el-form-item label="图片">

@@ -93,8 +93,13 @@ public class ImageStorage {
         ImageIO.write(thumb, format, target);
     }
 
+    /**
+     * 上传根目录：必须是**绝对路径**。
+     * Tomcat 的 MultipartFile.transferTo(File) 遇到相对路径会把它解析到 multipart 临时目录下，
+     * 导致「系统找不到指定的路径」。相对配置（./upload）按 JVM 工作目录展开后返回绝对 File。
+     */
     private File baseDir() {
-        return new File(uploadDir);
+        return new File(uploadDir).getAbsoluteFile();
     }
 
     private void mkdirs(File dir) {

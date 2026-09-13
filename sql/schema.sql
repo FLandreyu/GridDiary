@@ -37,6 +37,8 @@ CREATE TABLE `diary` (
   `content`    TEXT                                    COMMENT '正文',
   `cover`      VARCHAR(255)             DEFAULT NULL   COMMENT '封面缩略图（取第一张图）',
   `is_public`  TINYINT(1)      NOT NULL DEFAULT 1      COMMENT '是否公开：1公开 0仅自己',
+  `category`   VARCHAR(50)              DEFAULT NULL   COMMENT '分类（单选，可为空）',
+  `tags`       VARCHAR(255)             DEFAULT NULL   COMMENT '标签（逗号分隔，最多 5 个，FIND_IN_SET 过滤）',
   `like_count` INT UNSIGNED    NOT NULL DEFAULT 0      COMMENT '点赞数（冗余计数）',
   `created_at` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '发布时间',
   `updated_at` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP

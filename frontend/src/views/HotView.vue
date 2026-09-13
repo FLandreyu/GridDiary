@@ -2,6 +2,9 @@
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { hotDiaries } from "../api/diary";
+import AppSidebar from "../components/AppSidebar.vue";
+import SkeletonCards from "../components/SkeletonCards.vue";
+import TwoColLayout from "../components/TwoColLayout.vue";
 
 const router = useRouter();
 const loading = ref(false);
@@ -22,47 +25,51 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="hot-wrap">
+  <TwoColLayout>
     <h2 class="title">🔥 热门日记排行榜</h2>
 
-    <el-card v-loading="loading">
-      <el-empty
-        v-if="!loading && !list.length"
-        description="暂时还没有足够多的日记上榜"
-      />
-      <div
-        v-for="(d, i) in list"
-        :key="d.id"
-        class="row"
-        @click="router.push(`/diary/${d.id}`)"
-      >
-        <span :class="rankClass(i)">{{
-          i < 3 ? ["🥇", "🥈", "🥉"][i] : i + 1
-        }}</span>
-        <el-image
-          v-if="d.cover"
-          :src="d.cover"
-          fit="cover"
-          class="cover"
-          lazy
+    <el-card v-loading="loading && list.length > 0">
+      <SkeletonCards v-if="loading && !list.length" type="row" :count="6" />
+
+      <template v-else>
+        <el-empty
+          v-if="!list.length"
+          description="暂时还没有足够多的日记上榜"
         />
-        <div v-else class="cover placeholder">📔</div>
-        <div class="info">
-          <div class="d-title">{{ d.title }}</div>
-          <div class="d-meta">by {{ d.authorNickname || "匿名" }}</div>
+        <div
+          v-for="(d, i) in list"
+          :key="d.id"
+          class="row"
+          @click="router.push(`/diary/${d.id}`)"
+        >
+          <span :class="rankClass(i)">{{
+            i < 3 ? ["🥇", "🥈", "🥉"][i] : i + 1
+          }}</span>
+          <el-image
+            v-if="d.cover"
+            :src="d.cover"
+            fit="cover"
+            class="cover"
+            lazy
+          />
+          <div v-else class="cover placeholder">📔</div>
+          <div class="info">
+            <div class="d-title">{{ d.title }}</div>
+            <div class="d-meta">by {{ d.authorNickname || "匿名" }}</div>
+          </div>
+          <span class="gd-chip">💬 {{ d.commentCount ?? 0 }}</span>
+          <span class="likes">♥ {{ d.likeCount ?? 0 }}</span>
         </div>
-        <span class="gd-chip">💬 {{ d.commentCount ?? 0 }}</span>
-        <span class="likes">♥ {{ d.likeCount ?? 0 }}</span>
-      </div>
+      </template>
     </el-card>
-  </div>
+
+    <template #aside>
+      <AppSidebar />
+    </template>
+  </TwoColLayout>
 </template>
 
 <style scoped>
-.hot-wrap {
-  max-width: 720px;
-  margin: 0 auto;
-}
 .title {
   font-size: 20px;
   margin-bottom: 16px;

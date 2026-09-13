@@ -20,4 +20,8 @@
     <select id="countByUser" parameterType="long" resultType="long"> SELECT COUNT(*) FROM `checkin`
         WHERE user_id = #{userId} </select>
 
+    <select id="findDatesBetween" resultType="java.time.LocalDate"> SELECT checkin_date FROM
+        `checkin` WHERE user_id = #{userId} AND checkin_date &gt;= #{from} AND checkin_date &lt;
+        #{to} ORDER BY checkin_date </select>
+
 </mapper>

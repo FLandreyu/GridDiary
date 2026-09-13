@@ -21,6 +21,12 @@ public class DiaryVO {
     private String cover;
     private Boolean isPublic;
     private Integer likeCount;
+    /** 分类（可为空） */
+    private String category;
+    /** 标签，逗号分隔原值（前端用 toTagList 拆成数组） */
+    private String tags;
+    /** 正文字数（SQL 统计） */
+    private Integer wordCount;
     /** 图片数量（子查询统计） */
     private Integer imageCount;
     /** 评论数量（子查询统计） */

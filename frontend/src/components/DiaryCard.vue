@@ -1,12 +1,15 @@
 <script setup>
-import { ref } from "vue";
-import { timeAgo } from "../utils/format";
+import { computed, ref } from "vue";
+import { timeAgo, toTagList, wordCountText } from "../utils/format";
 
-defineProps({
+const props = defineProps({
   diary: { type: Object, required: true },
 });
 
 const placeholderOk = ref(true);
+
+/** 卡片空间有限，只展示前 2 个标签 */
+const tagList = computed(() => toTagList(props.diary.tags).slice(0, 2));
 
 function firstChar(nick) {
   return (nick || "?").charAt(0).toUpperCase();
@@ -58,7 +61,23 @@ function firstChar(nick) {
           <span class="nick">{{ diary.authorNickname || "匿名" }}</span>
         </span>
         <span class="time">{{ timeAgo(diary.createdAt) }}</span>
+        <span class="gd-words">{{ wordCountText(diary.wordCount) }}</span>
       </div>
+
+      <!-- 分类 / 标签（Mizuki 卡片 meta 行） -->
+      <div class="gd-tags">
+        <span v-if="diary.category" class="gd-cat"
+          >📂 {{ diary.category }}</span
+        >
+        <span
+          v-for="t in tagList"
+          :key="t"
+          class="gd-tag"
+          @click.stop="$router.push({ path: '/', query: { tag: t } })"
+          >#{{ t }}</span
+        >
+      </div>
+
       <div class="gd-chips">
         <span class="gd-chip hot"><i>♥</i>{{ diary.likeCount ?? 0 }}</span>
         <span class="gd-chip"><i>💬</i>{{ diary.commentCount ?? 0 }}</span>

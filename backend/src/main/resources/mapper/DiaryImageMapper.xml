@@ -15,6 +15,18 @@
             refid="columns" /> FROM `diary_image` WHERE diary_id = #{diaryId} ORDER BY sort_order
         ASC, id ASC </select>
 
+    <!-- 相册：只取公开日记的图，带日记标题与作者，按日记发布时间倒序 -->
+    <select id="selectGalleryPage" resultType="com.flandreyu.vo.GalleryImageVO"> SELECT di.id AS
+        image_id, d.id AS diary_id, d.title AS diary_title, di.original_url, di.thumb_url, d.user_id,
+        u.nickname AS author_nickname, u.avatar AS author_avatar, d.created_at FROM `diary_image`
+        di JOIN `diary` d ON di.diary_id = d.id LEFT JOIN `user` u ON d.user_id = u.id WHERE
+        d.is_public = 1 ORDER BY d.created_at DESC, d.id DESC, di.sort_order ASC, di.id ASC LIMIT
+        #{offset}, #{size} </select>
+
+    <!-- 相册总数 -->
+    <select id="countGallery" resultType="long"> SELECT COUNT(*) FROM `diary_image` di JOIN `diary`
+        d ON di.diary_id = d.id WHERE d.is_public = 1 </select>
+
     <delete id="deleteById" parameterType="long">
         DELETE FROM `diary_image` WHERE id = #{id}
     </delete>

@@ -18,6 +18,7 @@ import com.flandreyu.dto.RegisterRequest;
 import com.flandreyu.dto.ResetPasswordRequest;
 import com.flandreyu.dto.UpdateProfileRequest;
 import com.flandreyu.service.UserService;
+import com.flandreyu.vo.UserStatsVO;
 import com.flandreyu.vo.UserVO;
 
 import jakarta.servlet.http.HttpSession;
@@ -85,6 +86,13 @@ public class UserController {
     @PublicApi
     public Result<UserVO> profile(@PathVariable Long id) {
         return Result.ok(userService.profile(id));
+    }
+
+    /** 某用户的作品统计（详情页作者卡 / 个人主页，匿名可见） */
+    @GetMapping("/{id}/stats")
+    @PublicApi
+    public Result<UserStatsVO> userStats(@PathVariable Long id) {
+        return Result.ok(userService.stats(id));
     }
 
     /** 找回密码：提交邮箱获取验证码 */

@@ -16,6 +16,10 @@ export const listMyDiaries = (params) =>
 /** 热门排行榜 */
 export const hotDiaries = (limit = 10) =>
   request.get("/api/diary/hot", { params: { limit } }).then(payload);
+
+/** 相册：公开日记的图片流（分页，含日记标题与作者） */
+export const galleryImages = (params) =>
+  request.get("/api/diary/gallery", { params }).then(payload);
 /** 新建日记，返回日记ID */
 export const createDiary = (data) =>
   request.post("/api/diary", data).then(payload);

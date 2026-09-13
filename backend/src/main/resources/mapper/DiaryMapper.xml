@@ -3,18 +3,19 @@
 <mapper namespace="com.flandreyu.mapper.DiaryMapper">
 
     <!-- 不带作者信息的字段 -->
-    <sql id="columns"> id, user_id, title, content, cover, is_public, like_count, created_at,
-        updated_at </sql>
+    <sql id="columns"> id, user_id, title, content, cover, is_public, category, tags, like_count,
+        created_at, updated_at </sql>
 
-    <!-- 带作者昵称/头像的字段（JOIN user）＋图片数/评论数统计 -->
-    <sql id="voColumns"> d.id, d.user_id, d.title, d.content, d.cover, d.is_public, d.like_count,
-        d.created_at, d.updated_at, u.nickname AS author_nickname, u.avatar AS author_avatar,
-        (SELECT COUNT(*) FROM `diary_image` di WHERE di.diary_id = d.id) AS image_count, (SELECT
-        COUNT(*) FROM `comment` c WHERE c.diary_id = d.id) AS comment_count </sql>
+    <!-- 带作者昵称/头像的字段（JOIN user）＋图片数/评论数/字数统计 -->
+    <sql id="voColumns"> d.id, d.user_id, d.title, d.content, d.cover, d.is_public, d.category,
+        d.tags, d.like_count, d.created_at, d.updated_at, u.nickname AS author_nickname, u.avatar AS
+        author_avatar, CHAR_LENGTH(IFNULL(d.content, '')) AS word_count, (SELECT COUNT(*) FROM
+        `diary_image` di WHERE di.diary_id = d.id) AS image_count, (SELECT COUNT(*) FROM `comment`
+        c WHERE c.diary_id = d.id) AS comment_count </sql>
 
     <insert id="insert" parameterType="Diary" useGeneratedKeys="true" keyProperty="id"> INSERT INTO
-        `diary` (user_id, title, content, cover, is_public) VALUES (#{userId}, #{title}, #{content},
-        #{cover}, #{isPublic}) </insert>
+        `diary` (user_id, title, content, cover, is_public, category, tags) VALUES (#{userId},
+        #{title}, #{content}, #{cover}, #{isPublic}, #{category}, #{tags}) </insert>
 
     <select id="findById" parameterType="long" resultType="Diary"> SELECT <include refid="columns" />
         FROM `diary` WHERE id = #{id} </select>
@@ -30,6 +31,7 @@
             <if
                 test="keyword != null and keyword != ''"> AND (d.title LIKE CONCAT('%', #{keyword},
         '%') OR d.content LIKE CONCAT('%', #{keyword}, '%')) </if>
+            <if test="tag != null and tag != ''"> AND FIND_IN_SET(#{tag}, d.tags) </if>
         </where> ORDER BY
         d.created_at DESC, d.id DESC LIMIT #{offset}, #{size} </select>
 
@@ -39,8 +41,13 @@
             <if
                 test="keyword != null and keyword != ''"> AND (d.title LIKE CONCAT('%', #{keyword},
         '%') OR d.content LIKE CONCAT('%', #{keyword}, '%')) </if>
+            <if test="tag != null and tag != ''"> AND FIND_IN_SET(#{tag}, d.tags) </if>
         </where>
     </select>
+
+    <!-- 所有公开日记的标签原值（逗号分隔），供标签云/统计在 Java 侧聚合 -->
+    <select id="selectPublicTags" resultType="string"> SELECT tags FROM `diary` WHERE is_public = 1
+        AND tags IS NOT NULL AND tags &lt;&gt; '' </select>
 
     <!-- 我的日记（含私密），分页 -->
     <select id="selectByUserId" resultType="com.flandreyu.vo.DiaryVO"> SELECT <include
@@ -67,12 +74,29 @@
 
     <!-- 编辑整行更新（cover 允许置空） -->
     <update id="updateFull" parameterType="Diary"> UPDATE `diary` SET title = #{title}, content =
-        #{content}, cover = #{cover}, is_public = #{isPublic} WHERE id = #{id} </update>
+        #{content}, cover = #{cover}, is_public = #{isPublic}, category = #{category}, tags =
+        #{tags} WHERE id = #{id} </update>
 
     <!-- 点赞数增减，delta 为 +1 / -1 -->
     <update id="changeLikeCount"> UPDATE `diary` SET like_count = like_count + #{delta} WHERE id =
         #{id} </update>
 
     <delete id="deleteById" parameterType="long"> DELETE FROM `diary` WHERE id = #{id} </delete>
+
+    <!-- 站点统计：单行聚合（无日记时也返回一行，各计数为 0 / null） -->
+    <select id="selectSiteStats" resultType="com.flandreyu.vo.SiteStatsVO"> SELECT (SELECT COUNT(*)
+        FROM `diary` WHERE is_public = 1) AS post_count, (SELECT COUNT(*) FROM `user`) AS
+        user_count, (SELECT IFNULL(SUM(CHAR_LENGTH(content)), 0) FROM `diary` WHERE is_public = 1) AS
+        word_count, (SELECT IFNULL(SUM(like_count), 0) FROM `diary` WHERE is_public = 1) AS like_count,
+        (SELECT COUNT(*) FROM `comment`) AS comment_count, (SELECT COUNT(DISTINCT category) FROM
+        `diary` WHERE is_public = 1 AND category IS NOT NULL AND category &lt;&gt; '') AS
+        category_count, (SELECT IFNULL(DATEDIFF(NOW(),
+        MIN(created_at)) + 1, 0) FROM `diary`) AS run_days, (SELECT MAX(created_at) FROM `diary`
+        WHERE is_public = 1) AS last_active_at </select>
+
+    <!-- 某用户区间内有日记的日期（含私密），日历打点用 -->
+    <select id="selectDiaryDates" resultType="string"> SELECT DISTINCT DATE_FORMAT(created_at,
+        '%Y-%m-%d') FROM `diary` WHERE user_id = #{userId} AND created_at &gt;= #{from} AND
+        created_at &lt; #{to} </select>
 
 </mapper>

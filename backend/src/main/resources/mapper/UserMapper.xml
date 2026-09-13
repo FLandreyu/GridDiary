@@ -20,6 +20,14 @@
     <select id="findByEmail" parameterType="string" resultType="User"> SELECT <include
             refid="columns" /> FROM `user` WHERE email = #{email} </select>
 
+    <!-- 作品统计：单行聚合（用户不存在时各子查询返回 null/0） -->
+    <select id="selectStats" resultType="com.flandreyu.vo.UserStatsVO"> SELECT (SELECT COUNT(*) FROM
+        `diary` WHERE user_id = #{id} AND is_public = 1) AS post_count, (SELECT IFNULL(SUM(like_count),
+        0) FROM `diary` WHERE user_id = #{id} AND is_public = 1) AS like_count, (SELECT COUNT(*)
+        FROM `comment` c JOIN `diary` d ON c.diary_id = d.id WHERE d.user_id = #{id}) AS
+        comment_count, (SELECT created_at FROM `user` WHERE id = #{id}) AS created_at, (SELECT
+        IFNULL(DATEDIFF(NOW(), created_at) + 1, 0) FROM `user` WHERE id = #{id}) AS join_days </select>
+
     <!-- 动态更新：昵称 / 头像 / 邮箱 / 密码按需更新（用户名不允许改） -->
     <update id="update" parameterType="User"> UPDATE `user` <set>
             <if test="password != null">password = #{password},</if>

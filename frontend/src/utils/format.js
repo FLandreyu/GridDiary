@@ -32,3 +32,17 @@ export function formatTime(time) {
   const p = (n) => String(n).padStart(2, "0");
   return `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())} ${p(date.getHours())}:${p(date.getMinutes())}`;
 }
+
+/** 标签：后端用逗号分隔字符串存，这里拆成数组供页面渲染 */
+export function toTagList(tags) {
+  if (!tags) return [];
+  return String(tags)
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
+}
+
+/** 字数：0 字显示“空”，否则显示 N 字 */
+export function wordCountText(n) {
+  return n ? `${n} 字` : "空";
+}

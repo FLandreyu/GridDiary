@@ -1,6 +1,7 @@
 package com.flandreyu.mapper;
 
 import com.flandreyu.entity.User;
+import com.flandreyu.vo.UserStatsVO;
 
 /**
  * 用户表 Mapper
@@ -12,6 +13,9 @@ public interface UserMapper {
 
     /** 按主键查询 */
     User findById(Long id);
+
+    /** 作品统计（公开日记数 / 获赞 / 收到评论 / 注册天数），单行聚合 */
+    UserStatsVO selectStats(Long id);
 
     /** 按用户名查询（用于唯一校验 / 登录） */
     User findByUsername(String username);
