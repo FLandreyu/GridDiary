@@ -12,12 +12,14 @@ import com.flandreyu.common.BusinessException;
 import com.flandreyu.common.Result;
 import com.flandreyu.util.ImageStorage;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 /**
  * 文件上传接口（需登录）。上传成功后返回每张图片的 {originalUrl, thumbUrl}，
  * 前端在写日记/编辑日记时把地址随表单一起提交。
  */
+@Tag(name = "文件上传", description = "日记配图上传（原图 + 缩略图）")
 @RestController
 @RequestMapping("/api/upload")
 @RequiredArgsConstructor

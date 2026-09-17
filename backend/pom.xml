@@ -54,6 +54,12 @@
 			<artifactId>mybatis-spring-boot-starter</artifactId>
 			<version>4.0.1</version>
 		</dependency>
+		<!-- 接口文档：Swagger UI（3.x 才支持 Spring Boot 4；3.0.3 对应 Boot 4.0.x） -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>3.0.3</version>
+		</dependency>
 
 		<dependency>
 			<groupId>com.mysql</groupId>

@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { listDiaries } from "../api/diary";
@@ -20,7 +20,7 @@ const records = ref([]);
 const total = ref(0);
 const page = ref(1);
 const size = 12;
-const keyword = ref("");
+const keyword = ref(route.query.keyword || "");
 const heroOk = ref(true);
 
 /* ---------------- 侧边栏 / 视图 ---------------- */
@@ -80,6 +80,59 @@ watch(
   { immediate: true },
 );
 
+/* ---------------- Hero 入场编排：图片 → 大字淡入 → 小字逐字打出 ----------------
+   时序与 theme.css 里的动画对齐：
+   0s 图片淡入(0.8s) → 0.7s 大字淡入(0.9s) → 1.55s 小字逐字(85ms/字) → 打完后光标淡出 */
+const HERO_SUB = "把每一天，装进属于你的九宫格 ✦";
+const typed = ref(0);
+const typingDone = ref(false);
+let startTimer = null;
+let typeTimer = null;
+let doneTimer = null;
+
+const TYPE_DELAY = 1550; // 等图片与大字入场完
+const TYPE_SPEED = 85; // 每个字的间隔（ms）
+
+function stopHeroIntro() {
+  [startTimer, typeTimer, doneTimer].forEach(
+    (t) => t && window.clearTimeout(t),
+  );
+  if (typeTimer) window.clearInterval(typeTimer);
+  startTimer = typeTimer = doneTimer = null;
+}
+
+function playHeroIntro() {
+  stopHeroIntro();
+  typed.value = 0;
+  typingDone.value = false;
+  startTimer = window.setTimeout(() => {
+    typeTimer = window.setInterval(() => {
+      if (typed.value >= HERO_SUB.length) {
+        window.clearInterval(typeTimer);
+        typeTimer = null;
+        // 打完停一会儿再让光标淡出
+        doneTimer = window.setTimeout(() => (typingDone.value = true), 1200);
+        return;
+      }
+      typed.value += 1;
+    }, TYPE_SPEED);
+  }, TYPE_DELAY);
+}
+
+onMounted(() => {
+  // 尊重系统「减弱动态效果」：直接显示完整文案，不做逐字动画
+  const reduce = window.matchMedia?.(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+  if (reduce) {
+    typed.value = HERO_SUB.length;
+    typingDone.value = true;
+  } else {
+    playHeroIntro();
+  }
+});
+onBeforeUnmount(stopHeroIntro);
+
 /** 侧边栏/标签云点进来的标签筛选（?tag=xxx） */
 const activeTag = computed(() => route.query.tag || "");
 
@@ -106,11 +159,26 @@ async function load(p = 1) {
   }
 }
 
-// 标签变化（标签云/卡片点击、浏览器前进后退）时重新拉第一页
-watch(activeTag, () => load(1));
+// 顶栏搜索 / 标签云 / 卡片点击导致的 URL 变化（含浏览器前进后退）：
+// 同步本地关键词并重拉第一页
+watch(
+  () => `${route.query.keyword || ""}|${route.query.tag || ""}`,
+  () => {
+    keyword.value = route.query.keyword || "";
+    load(1);
+  },
+);
 
+/** 搜索：同步到 URL（与顶栏搜索框共用 ?keyword=）再拉第一页 */
 function onSearch() {
-  load(1);
+  const kw = keyword.value.trim();
+  if (kw === (route.query.keyword || "")) {
+    load(1);
+    return;
+  }
+  router
+    .push({ path: "/", query: { ...route.query, keyword: kw || undefined } })
+    .catch(() => {});
 }
 
 function onPageChange(p) {
@@ -138,12 +206,22 @@ onMounted(() => load(1));
     </div>
     <div class="hero-inner">
       <h1>九宫格记忆网</h1>
-      <p>把每一天，装进属于你的九宫格 ✦</p>
-      <div v-if="store.isLogin" class="hero-dots">
-        <span @click="router.push('/diary/new')">✍️ 写日记</span>
-        <span @click="router.push('/hot')">🔥 排行榜</span>
-        <span @click="router.push('/my')">📚 我的日记</span>
-      </div>
+      <!-- 小字：打完的字符 + 闪烁光标；完整文案给读屏器，动画部分对读屏器隐藏 -->
+      <p class="hero-sub">
+        <span class="sr-only">{{ HERO_SUB }}</span>
+        <span aria-hidden="true"
+          >{{ HERO_SUB.slice(0, typed)
+          }}<i class="hero-caret" :class="{ done: typingDone }"></i
+        ></span>
+      </p>
+    </div>
+
+    <!-- 与下方日记列表交汇处的波浪：
+         填充用的是和 body 同一套「fixed 背景」，所以下沿与页面背景无缝；
+         形状靠 SVG data-URI 做 mask，可横向无缝平铺 + 缓慢漂移 -->
+    <div class="hero-wave" aria-hidden="true">
+      <i class="wv wv-back"></i>
+      <i class="wv wv-front"></i>
     </div>
   </section>
 
@@ -163,7 +241,7 @@ onMounted(() => load(1));
         </el-radio-group>
         <el-input
           v-model="keyword"
-          class="search"
+          class="search gd-search-narrow"
           placeholder="搜索标题 / 正文关键词"
           clearable
           @keyup.enter="onSearch"

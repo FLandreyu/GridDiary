@@ -20,6 +20,7 @@ import com.flandreyu.service.DiaryService;
 import com.flandreyu.vo.DiaryVO;
 import com.flandreyu.vo.UserVO;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 /**
  * 日记模块接口
  */
+@Tag(name = "日记模块", description = "发布 / 浏览 / 检索日记、热门排行、相册")
 @RestController
 @RequestMapping("/api/diary")
 @RequiredArgsConstructor

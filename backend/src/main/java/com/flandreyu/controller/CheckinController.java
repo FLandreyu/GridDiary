@@ -10,6 +10,7 @@ import com.flandreyu.service.CheckinService;
 import com.flandreyu.util.UserSessionUtil;
 import com.flandreyu.vo.CheckinVO;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
  * 每日打卡接口（需求新增：首页打卡 + 今日运势）
  * 两个接口都需要登录（未标 @PublicApi，由 LoginInterceptor 拦截）
  */
+@Tag(name = "打卡模块", description = "每日打卡与今日运势")
 @RestController
 @RequestMapping("/api/checkin")
 @RequiredArgsConstructor

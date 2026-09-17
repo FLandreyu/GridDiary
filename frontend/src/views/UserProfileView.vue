@@ -7,6 +7,7 @@ import { useUserStore } from "../store/user";
 import AppSidebar from "../components/AppSidebar.vue";
 import DiaryCard from "../components/DiaryCard.vue";
 import TwoColLayout from "../components/TwoColLayout.vue";
+import WriteHeatmap from "../components/WriteHeatmap.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -98,7 +99,15 @@ onMounted(() => {});
       </template>
     </el-card>
 
-    <h3 class="sub">TA 的公开日记（{{ total }}）</h3>
+    <WriteHeatmap
+      class="profile-heatmap"
+      :user-id="isSelf ? null : userId"
+      :title="isSelf ? '我的写作热力图' : 'TA 的写作热力图'"
+    />
+
+    <h3 class="sub">
+      {{ isSelf ? "我的公开日记" : "TA 的公开日记" }}（{{ total }}）
+    </h3>
     <div v-loading="loading">
       <div v-if="records.length" class="grid">
         <DiaryCard v-for="d in records" :key="d.id" :diary="d" />
@@ -111,7 +120,7 @@ onMounted(() => {});
     </div>
 
     <template #aside>
-      <AppSidebar />
+      <AppSidebar :heatmap="false" />
     </template>
   </TwoColLayout>
 </template>
@@ -137,6 +146,9 @@ onMounted(() => {});
 .sub {
   margin: 18px 0 14px;
   font-size: 17px;
+}
+.profile-heatmap {
+  margin-top: 16px;
 }
 .grid {
   display: grid;

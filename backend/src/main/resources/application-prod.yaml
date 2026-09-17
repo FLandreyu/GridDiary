@@ -1,0 +1,32 @@
+# =============================================================
+# 打包成 exe 运行时的配置（jpackage 启动参数中激活 prod profile）
+# 优先级低于 exe 同级目录下的 config/application.yaml，用户可用它覆盖这里的任何配置
+# =============================================================
+
+spring:
+    datasource:
+        # createDatabaseIfNotExist=true：数据库不存在时自动创建；
+        # 配合 classpath:db/init.sql（全部 IF NOT EXISTS）做到首次运行自动建库建表
+        url: jdbc:mysql://localhost:3306/grid_diary?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+        # 优先读环境变量；未设置时回退默认值，也可用 exe 同级 config/application.yaml 覆盖
+        username: ${DB_USERNAME:root}
+        password: ${DB_PASSWORD:root}
+    sql:
+        init:
+            # 每次启动都检查一遍数据表是否齐全；脚本是幂等的，不会清空已有数据
+            mode: always
+            continue-on-error: true # 单条语句失败（如无建库权限）不阻断启动
+            encoding: UTF-8
+            schema-locations: classpath:db/init.sql
+
+# 启动完成后自动打开浏览器，做到「双击即用」
+app:
+    open-browser: true
+
+# 打包运行不需要接口文档的调试便利，保留即可；
+# 若想彻底关闭 Swagger UI，把下面两行改成 false
+springdoc:
+    api-docs:
+        enabled: true
+    swagger-ui:
+        enabled: true

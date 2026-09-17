@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.flandreyu.entity.Diary;
 import com.flandreyu.vo.DiaryVO;
+import com.flandreyu.vo.HeatmapPointVO;
 import com.flandreyu.vo.SiteStatsVO;
 
 /**
@@ -70,4 +71,14 @@ public interface DiaryMapper {
         List<String> selectDiaryDates(@Param("userId") Long userId,
                         @Param("from") String from,
                         @Param("to") String to);
+
+        /**
+         * 写作热力图：按天聚合篇数与字数（from 含、to 不含）
+         *
+         * @param onlyPublic true 时只统计公开日记（他人主页可见）
+         */
+        List<HeatmapPointVO> selectHeatmap(@Param("userId") Long userId,
+                        @Param("from") String from,
+                        @Param("to") String to,
+                        @Param("onlyPublic") boolean onlyPublic);
 }

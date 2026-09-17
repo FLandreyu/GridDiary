@@ -21,8 +21,26 @@
   --gd-text: #2b2f45;
   --gd-text-sub: #6b7292;
   --gd-heart: #f2599a;
-  --gd-shadow: 0 12px 30px rgba(124, 108, 255, 0.14);
-  --gd-shadow-hover: 0 18px 40px rgba(124, 108, 255, 0.24);
+  /* ---- 字体：标题/UI 用可爱圆体（站酷快乐体），正文用秀气体（站酷小薇） ---- */
+  --gd-font-display:
+    "ZCOOL KuaiLe", "Yuanti SC", "YouYuan", "PingFang SC", "Microsoft YaHei",
+    sans-serif;
+  --gd-font-body:
+    "ZCOOL XiaoWei", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial,
+    sans-serif;
+  /* 写作热力图色阶（0 空 → 4 最多） */
+  --gd-heat-0: rgba(126, 134, 205, 0.16);
+  --gd-heat-1: #dcd7ff;
+  --gd-heat-2: #b9afff;
+  --gd-heat-3: #9182ff;
+  --gd-heat-4: #6a55f0;
+  /* Hero 底部波浪的浪花色 */
+  --gd-wave-foam: rgba(255, 255, 255, 0.5);
+  /* 卡片阴影：对齐参考稿的“极淡”质感（原来是 0 12px 30px 彩色阴影，太重） */
+  --gd-shadow: 0 6px 20px rgba(30, 34, 74, 0.07);
+  --gd-shadow-hover: 0 14px 30px rgba(124, 108, 255, 0.16);
+  /* 行间极淡分隔线（用于侧栏统计、菜单等） */
+  --gd-hairline: rgba(126, 134, 205, 0.14);
   --gd-radius: 18px;
   --gd-radius-sm: 12px;
 
@@ -49,8 +67,15 @@ html.dark {
   --gd-text: #eef1ff;
   --gd-text-sub: #bfc5e6;
   --gd-heart: #ff8fb3;
-  --gd-shadow: 0 14px 34px rgba(0, 0, 0, 0.5);
-  --gd-shadow-hover: 0 20px 46px rgba(0, 0, 0, 0.6);
+  --gd-heat-0: rgba(150, 160, 255, 0.13);
+  --gd-heat-1: #363a63;
+  --gd-heat-2: #514797;
+  --gd-heat-3: #7a68e8;
+  --gd-heat-4: #a99bff;
+  --gd-wave-foam: rgba(255, 255, 255, 0.32);
+  --gd-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --gd-shadow-hover: 0 16px 34px rgba(0, 0, 0, 0.55);
+  --gd-hairline: rgba(150, 160, 255, 0.15);
 
   --el-color-primary: #9d8dff;
   --el-color-primary-dark-2: #8676f2;
@@ -84,16 +109,30 @@ html.dark .el-form-item__label {
 * {
   box-sizing: border-box;
 }
+/* 仅供读屏器的隐藏文本（用于打字机动画时保留完整语义） */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 0;
+  clip-path: inset(50%);
+}
 html,
 body,
 #app {
   height: 100%;
   margin: 0;
 }
+html {
+  font-family: var(--gd-font-body);
+}
 body {
-  font-family:
-    "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", "Helvetica Neue",
-    Arial, sans-serif;
+  /* 字体统一由 html 上的 --gd-font-body 决定（覆盖 styles.css 里的旧字体栈） */
+  font-family: inherit;
   color: var(--gd-text);
   background: var(--gd-bg-1);
   background-image:
@@ -246,6 +285,46 @@ html.dark body::before {
   color: #fff !important;
   backdrop-filter: blur(8px);
 }
+/* 透明模式下：搜索胶囊与图标按钮也换成玻璃白 */
+.app-header.hero-mode .hd-search {
+  border-color: rgba(255, 255, 255, 0.38);
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(8px);
+}
+.app-header.hero-mode .hd-search:focus-within {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.26);
+}
+.app-header.hero-mode .hd-search-input {
+  color: #fff;
+}
+.app-header.hero-mode .hd-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.82);
+}
+.app-header.hero-mode .hd-search-ico {
+  opacity: 0.92;
+  color: #fff;
+}
+.app-header.hero-mode .gd-icon-btn {
+  border-color: rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  backdrop-filter: blur(8px);
+}
+.app-header.hero-mode .gd-icon-btn:hover {
+  border-color: #fff;
+  color: #fff;
+}
+.app-header.hero-mode .gd-mini-btn {
+  border-color: rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  backdrop-filter: blur(8px);
+}
+.app-header.hero-mode .gd-mini-btn.primary {
+  border-color: rgba(255, 255, 255, 0.52);
+  background: rgba(255, 255, 255, 0.28);
+}
 .app-header.hero-mode .el-button--primary {
   background: rgba(255, 255, 255, 0.28) !important;
   border-color: rgba(255, 255, 255, 0.5) !important;
@@ -279,13 +358,14 @@ html.dark body::before {
 }
 .nav {
   display: flex;
-  gap: 8px;
+  /* 项间只留 2px：胶囊 hover 时不会粘在一起，又不会出现大片空白 */
+  gap: 2px;
 }
 .nav-item {
   cursor: pointer;
   color: var(--gd-text-sub);
   font-size: 14.5px;
-  padding: 7px 14px;
+  padding: 7px 10px;
   border-radius: 999px;
   transition: all 0.22s ease;
   position: relative;
@@ -325,6 +405,182 @@ html.dark body::before {
   color: var(--gd-primary);
 }
 
+/* ---------------- 顶栏：左/右分区 + 搜索胶囊 + 图标按钮 ---------------- */
+.app-header .left,
+.app-header .right {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.app-header .left {
+  gap: 22px;
+}
+.app-header .right {
+  gap: 10px;
+}
+/* 常驻搜索胶囊（对应 Mizuki 顶栏的搜索框） */
+.app-header .hd-search {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 196px;
+  height: 34px;
+  padding: 0 12px 0 32px;
+  border-radius: 999px;
+  border: 1px solid var(--gd-border);
+  background: var(--gd-surface-soft);
+  transition:
+    width 0.24s ease,
+    background-color 0.24s ease,
+    border-color 0.24s ease;
+}
+.app-header .hd-search:focus-within {
+  width: 236px;
+  border-color: var(--gd-primary);
+  background: var(--gd-surface-solid);
+}
+.app-header .hd-search-ico {
+  position: absolute;
+  left: 11px;
+  font-size: 12.5px;
+  line-height: 1;
+  opacity: 0.65;
+  pointer-events: none;
+}
+.app-header .hd-search-input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--gd-text);
+  font-size: 13px;
+  font-family: inherit;
+}
+.app-header .hd-search-input::placeholder {
+  color: var(--gd-text-sub);
+}
+.app-header .hd-search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+/* 通用圆形图标按钮（顶栏右侧一律用图标，不再用文字按钮） */
+.gd-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--gd-border);
+  background: var(--gd-surface-soft);
+  color: var(--gd-text);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.22s ease;
+}
+.gd-icon-btn:hover {
+  border-color: var(--gd-primary);
+  color: var(--gd-primary);
+}
+.gd-icon-btn .el-avatar {
+  border: 1px solid var(--gd-border);
+}
+/* 迷你文字按钮（未登录时的登录/注册，保持清晰可辨） */
+.gd-mini-btn {
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--gd-border);
+  background: var(--gd-surface-soft);
+  color: var(--gd-text);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.22s ease;
+}
+.gd-mini-btn:hover {
+  border-color: var(--gd-primary);
+  color: var(--gd-primary);
+}
+.gd-mini-btn.primary {
+  border-color: transparent;
+  background: linear-gradient(120deg, var(--gd-primary), var(--gd-primary-2));
+  color: #fff;
+}
+
+/* 头像下拉菜单（自实现，避免引入 el-dropdown 的 popper） */
+.gd-usermenu-wrap {
+  position: relative;
+}
+/* 顶栏头像按钮：直接用原生 img / 文字，不用 el-avatar（后者会把 el-icon 带进入口包） */
+.gd-avatar-btn {
+  overflow: hidden;
+}
+.hd-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 50%;
+}
+.hd-avatar-char {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 700;
+  background: linear-gradient(120deg, var(--gd-primary), var(--gd-primary-2));
+}
+.gd-usermenu {
+  position: absolute;
+  top: calc(100% + 9px);
+  right: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 136px;
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid var(--gd-border);
+  background: var(--gd-surface-solid);
+  box-shadow: var(--gd-shadow);
+  animation: gd-fade-up 0.18s ease both;
+}
+.gd-usermenu .um-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--gd-text);
+  font-size: 13.5px;
+  font-family: inherit;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+.gd-usermenu .um-item:hover {
+  background: var(--gd-surface-soft);
+  color: var(--gd-primary);
+}
+.gd-usermenu .um-item.danger:hover {
+  color: #f56c6c;
+}
+
 /* ---------------- 通用容器 / 卡片 ---------------- */
 .el-main {
   position: relative;
@@ -362,7 +618,8 @@ html.dark body::before {
    负 margin 数值 = .el-main 的 padding（80px 22px 40px），改 padding 要同步改这里 */
 .gd-hero-full {
   position: relative;
-  height: clamp(260px, 38vw, 460px);
+  /* 参考 Mizuki：横幅约为屏幕高的 60%，最高 620px */
+  height: clamp(300px, 60vh, 620px);
   /* 上边 -80px 让图片一直钻到固定顶栏底下（顶栏透明后才能融为一体） */
   margin: -80px -22px 26px;
   display: flex;
@@ -372,11 +629,13 @@ html.dark body::before {
   overflow: hidden;
   /* 无边框 / 无圆角 / 无阴影，避免看起来像一张卡片 */
   background: transparent;
-  animation: gd-fade-up 0.5s ease both;
+  /* 入场交给内部各层自己编排（图片 → 大字 → 小字），这里不再整体淡入；
+     也避免了祖先 transform 让底部波浪的 background-attachment: fixed 失效 */
 }
 
 /* 背景层：渐变兜底 + 可选图片 + 压暗层，三者共用一个底部渐隐遮罩，
-   底部自然溶进页面背景；顶部不再淡出（那里已由顶栏的透明遮罩处理） */
+   底部自然溶进页面背景；顶部不再淡出（那里已由顶栏的透明遮罩处理）。
+   底部淡出只留最后一小段：真正的“边界”交给下面的波浪，图片不至于提前变淡 */
 .gd-hero-full .hero-bg {
   position: absolute;
   inset: 0;
@@ -384,7 +643,7 @@ html.dark body::before {
   -webkit-mask-image: linear-gradient(
     180deg,
     #000 0%,
-    #000 72%,
+    #000 88%,
     transparent 100%
   );
   mask-image: linear-gradient(180deg, #000 0%, #000 72%, transparent 100%);
@@ -417,23 +676,23 @@ html.dark body::before {
     );
 }
 
-/* 文字层：不被遮罩影响，始终完整显示；顶部留出固定顶栏高度 */
+/* 文字层：不被遮罩影响，始终完整显示 */
 .gd-hero-full .hero-inner {
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  max-width: 760px;
-  padding: 56px 24px 10px;
+  gap: 14px;
+  max-width: 900px;
+  padding: 28px 24px;
 }
 /* 文字背后再加一层高斯模糊暗晕：无论插画多亮，标题都不会与画面打架，
    且因为是模糊渐变，看不出任何边界 */
 .gd-hero-full .hero-inner::before {
   content: "";
   position: absolute;
-  inset: -34px -90px;
+  inset: -46px -130px;
   z-index: -1;
   border-radius: 50%;
   background: radial-gradient(
@@ -442,47 +701,169 @@ html.dark body::before {
     rgba(14, 10, 36, 0.28) 62%,
     rgba(14, 10, 36, 0) 100%
   );
-  filter: blur(26px);
+  filter: blur(32px);
   pointer-events: none;
 }
 .gd-hero-full .hero-inner h1 {
   margin: 0;
-  font-size: clamp(28px, 4vw, 48px);
+  /* 海报级标题：5vw，最大 84px（参考图约 5.1vw） */
+  font-size: clamp(36px, 5vw, 84px);
   font-weight: 800;
-  letter-spacing: 6px;
+  letter-spacing: 4px;
+  line-height: 1.12;
   color: #fff;
+  /* 描边：paint-order: stroke fill 让描边画在字形之下，不会吃掉笔画粗细 */
+  -webkit-text-stroke: 3px rgba(12, 10, 34, 0.42);
+  paint-order: stroke fill;
   text-shadow:
-    0 2px 6px rgba(10, 8, 30, 0.6),
-    0 12px 38px rgba(10, 8, 30, 0.5);
+    0 3px 10px rgba(10, 8, 30, 0.55),
+    0 14px 42px rgba(10, 8, 30, 0.45);
 }
 .gd-hero-full .hero-inner p {
   margin: 0;
-  font-size: clamp(13px, 1.4vw, 16px);
-  letter-spacing: 3px;
-  color: rgba(255, 255, 255, 0.94);
-  text-shadow: 0 2px 12px rgba(10, 8, 30, 0.7);
+  font-size: clamp(15px, 1.9vw, 30px);
+  letter-spacing: 6px;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 2px 14px rgba(10, 8, 30, 0.72);
 }
-.gd-hero-full .hero-dots {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 8px;
-  white-space: nowrap;
+
+/* ---------------- Hero 底部波浪（横幅与下方内容的交汇处） ----------------
+   形状：SVG data-URI 做 mask（3 个波峰，首尾切线与高度一致，所以能 repeat-x
+        无缝拼接）；
+   填充：用与 body 完全相同的底色 + 3 个径向渐变，并加
+        background-attachment: fixed —— fixed 背景按「视口」定位，因此波浪下沿
+        与页面背景**像素级一致**，不会出现色带接缝；
+   层次：.wv-back 上移 12px 做白色浪花，下半被 .wv-front 的实心部分挡住，只露浪尖。 */
+.gd-hero-full .hero-wave {
+  /* 1440×96 的波浪，填的是「波峰以下」→ 作为 mask 时即“页面从水里升起来”的轮廓 */
+  --gd-wave-shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 96' preserveAspectRatio='none'%3E%3Cpath d='M0,52 C60,80 120,80 180,52 C240,24 300,24 360,52 C420,80 480,80 540,52 C600,24 660,24 720,52 C780,80 840,80 900,52 C960,24 1020,24 1080,52 C1140,80 1200,80 1260,52 C1320,24 1380,24 1440,52 L1440,96 L0,96 Z' fill='%23fff'/%3E%3C/svg%3E");
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 88px;
+  z-index: 2; /* 高于 .hero-inner(1)，但文字在中部，不会被压到 */
+  pointer-events: none;
 }
-.gd-hero-full .hero-dots span {
-  padding: 6px 16px;
-  font-size: 12.5px;
-  border-radius: 999px;
-  cursor: pointer;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.32);
-  backdrop-filter: blur(8px);
-  transition: all 0.22s ease;
+.gd-hero-full .hero-wave .wv {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  -webkit-mask-image: var(--gd-wave-shape);
+  mask-image: var(--gd-wave-shape);
+  -webkit-mask-size: 200% 100%; /* 铺满 2 倍宽度：既能平铺，又能用 % 做位移动画 */
+  mask-size: 200% 100%;
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+  -webkit-mask-position: 0% 100%;
+  mask-position: 0% 100%;
+  animation: gd-wave-drift 14s linear infinite;
 }
-.gd-hero-full .hero-dots span:hover {
-  background: rgba(255, 255, 255, 0.34);
-  transform: translateY(-2px);
+/* 前沿 = 页面背景（与 body 同款 fixed 渐变），所以下沿完全融进页面 */
+.gd-hero-full .hero-wave .wv-front {
+  background-color: var(--gd-bg-1);
+  background-image:
+    radial-gradient(
+      900px 500px at 8% -6%,
+      rgba(124, 108, 255, 0.22),
+      transparent 60%
+    ),
+    radial-gradient(
+      760px 460px at 96% 4%,
+      rgba(255, 122, 189, 0.2),
+      transparent 62%
+    ),
+    radial-gradient(
+      700px 520px at 50% 108%,
+      rgba(63, 216, 255, 0.18),
+      transparent 60%
+    );
+  background-attachment: fixed;
+}
+/* 后沿 = 白色浪花，上移 12px，只露出浪尖 */
+.gd-hero-full .hero-wave .wv-back {
+  bottom: 12px;
+  background: linear-gradient(
+    180deg,
+    var(--gd-wave-foam),
+    rgba(255, 255, 255, 0) 72%
+  );
+  animation-duration: 21s;
+  animation-direction: reverse;
+}
+/* 横向漂移：正好一个 tile（200%），所以循环处无跳变 */
+@keyframes gd-wave-drift {
+  from {
+    -webkit-mask-position: 0% 100%;
+    mask-position: 0% 100%;
+  }
+  to {
+    -webkit-mask-position: 200% 100%;
+    mask-position: 200% 100%;
+  }
+}
+
+/* ---------------- Hero 入场编排：图片 → 大字淡入 → 小字逐字打出 -------------
+   节奏：0s 图片(0.8s) → 0.7s 大字(0.9s，模糊消散 + 轻微上浮) → 1.55s 小字(JS 驱动)
+   关键帧只写 from，终态取元素自身样式 —— 否则 fill: forwards 会把响应式里的
+   letter-spacing / font-size 等覆盖掉 */
+@keyframes gd-hero-bg-in {
+  from {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
+@keyframes gd-hero-title-in {
+  from {
+    opacity: 0;
+    filter: blur(14px);
+    transform: translateY(18px) scale(0.98);
+  }
+}
+@keyframes gd-caret-blink {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  95% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* 第一幕：图片淡入（轻微放大回位） */
+.gd-hero-full .hero-bg {
+  animation: gd-hero-bg-in 0.8s ease-out backwards;
+}
+/* 第二幕：大字隐隐出现 */
+.gd-hero-full .hero-inner h1 {
+  animation: gd-hero-title-in 0.9s cubic-bezier(0.22, 0.68, 0.3, 1) 0.7s
+    backwards;
+}
+/* 第三幕：小字逐字打出（字符由 JS 控制，这里只管光标） */
+.gd-hero-full .hero-sub {
+  /* 预留一行高度：小字未开始时不会把大字顶下去 */
+  min-height: 1.6em;
+}
+.gd-hero-full .hero-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 4px;
+  vertical-align: -0.12em;
+  border-radius: 1px;
+  background: currentColor;
+  animation: gd-caret-blink 0.9s steps(1, end) infinite;
+}
+.gd-hero-full .hero-caret.done {
+  animation: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
 
 @keyframes gd-hero-zoom {
@@ -552,7 +933,6 @@ html.dark body::before {
 /* ---------------- 日记卡片 ---------------- */
 .diary-card {
   background: var(--gd-surface) !important;
-  border: 1px solid var(--gd-border) !important;
   border-radius: var(--gd-radius) !important;
   box-shadow: var(--gd-shadow);
   overflow: hidden;
@@ -560,7 +940,6 @@ html.dark body::before {
 }
 .diary-card:hover {
   transform: translateY(-6px) scale(1.01);
-  border-color: rgba(124, 108, 255, 0.45) !important;
   box-shadow: var(--gd-shadow-hover) !important;
 }
 .diary-card .cover::after {
@@ -1011,18 +1390,15 @@ html.dark body::before {
 /* 窄屏：Hero 降低高度；打卡卡自适应宽度 */
 @media (max-width: 720px) {
   .gd-hero-full {
-    height: 300px;
+    height: 340px;
     margin-bottom: 20px;
   }
   .gd-hero-full .hero-inner h1 {
-    letter-spacing: 3px;
+    letter-spacing: 2px;
   }
-  .gd-hero-full .hero-dots {
-    gap: 6px;
-  }
-  .gd-hero-full .hero-dots span {
-    padding: 4px 10px;
-    font-size: 11.5px;
+  /* Hero 变矮了，波浪同步收窄，避免压到标题 */
+  .gd-hero-full .hero-wave {
+    height: 56px;
   }
   .gd-checkin {
     min-width: 0;
@@ -1038,7 +1414,7 @@ html.dark body::before {
 .gd-panel {
   padding: 14px 16px 16px;
   border-radius: var(--gd-radius);
-  border: 1px solid var(--gd-border);
+  /* 参考稿的卡片无描边，靠极淡阴影分层 */
   background: var(--gd-surface-solid);
   box-shadow: var(--gd-shadow);
   animation: gd-fade-up 0.45s ease both;
@@ -1046,27 +1422,40 @@ html.dark body::before {
 .gd-panel-title {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   margin-bottom: 12px;
   font-size: 14.5px;
   font-weight: 800;
   letter-spacing: 0.4px;
   color: var(--gd-text);
 }
-.gd-panel-title::after {
+/* 标题前的主色竖线装饰（对齐 Mizuki 的 ▎标题） */
+.gd-panel-title::before {
   content: "";
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, var(--gd-border), transparent);
+  flex: 0 0 auto;
+  width: 4px;
+  height: 15px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--gd-primary), var(--gd-accent));
 }
 
-/* 站点统计 */
+/* 站点统计：每行一条极淡分隔线（参考稿的 Site Statistics） */
 .gd-stats {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  row-gap: 9px;
-  column-gap: 10px;
+  display: flex;
+  flex-direction: column;
   font-size: 13px;
+}
+.gd-stats .stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--gd-hairline);
+}
+.gd-stats .stat-row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
 }
 .gd-stats .k {
   color: var(--gd-text-sub);
@@ -1076,6 +1465,47 @@ html.dark body::before {
   color: var(--gd-text);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+}
+
+/* ---------------- 分页：圆角方块 + 当前页主色实心（对齐参考稿） ----------------
+   选择器加 html 前缀提高优先级：分页所在路由是懒加载的，Element Plus 样式会在
+   theme.css 之后注入，同优先级的规则会被它覆盖 */
+html .el-pagination.is-background .btn-prev,
+html .el-pagination.is-background .btn-next,
+html .el-pagination.is-background .el-pager li {
+  min-width: 32px;
+  height: 32px;
+  margin: 0 3px;
+  border-radius: 10px;
+  background: var(--gd-surface-soft);
+  color: var(--gd-text);
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+html .el-pagination.is-background .btn-prev,
+html .el-pagination.is-background .btn-next {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+html .el-pagination.is-background .el-pager li {
+  line-height: 32px;
+}
+html .el-pagination.is-background .el-pager li:hover {
+  background: rgba(124, 108, 255, 0.16);
+  color: var(--gd-primary);
+}
+html .el-pagination.is-background .el-pager li.is-active,
+html .el-pagination.is-background .el-pager li.is-active:hover {
+  background: linear-gradient(120deg, var(--gd-primary), var(--gd-primary-2));
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(124, 108, 255, 0.3);
+}
+html .el-pagination.is-background .btn-prev:disabled,
+html .el-pagination.is-background .btn-next:disabled {
+  background: var(--gd-surface-soft);
+  color: var(--gd-text-sub);
+  opacity: 0.55;
 }
 
 /* ---------------- 侧边栏日历 ---------------- */
@@ -1173,28 +1603,27 @@ html.dark .gd-calendar .cal-cell.marked {
 /* ---------------- 横向列表卡（首页列表视图） ---------------- */
 .gd-item {
   display: grid;
-  grid-template-columns: 176px minmax(0, 1fr);
-  gap: 16px;
+  /* 缩略图（已放大）| 正文 | 右侧箭头 */
+  grid-template-columns: 208px minmax(0, 1fr) auto;
+  gap: 18px;
   padding: 14px;
   margin-bottom: 16px;
   border-radius: var(--gd-radius);
-  border: 1px solid var(--gd-border);
+  /* 无描边，靠极淡阴影分层（对齐参考稿） */
   background: var(--gd-surface);
   box-shadow: var(--gd-shadow);
   cursor: pointer;
   animation: gd-fade-up 0.4s ease both;
   transition:
     transform 0.18s ease,
-    box-shadow 0.18s ease,
-    border-color 0.18s ease;
+    box-shadow 0.18s ease;
 }
 .gd-item:hover {
   transform: translateY(-4px);
-  border-color: rgba(124, 108, 255, 0.45);
   box-shadow: var(--gd-shadow-hover);
 }
 .gd-item .item-thumb {
-  height: 118px;
+  height: 142px;
   border-radius: var(--gd-radius-sm);
   overflow: hidden;
   background: var(--gd-surface-soft);
@@ -1231,12 +1660,72 @@ html.dark .gd-calendar .cal-cell.marked {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+/* 标题前的竖线装饰（对齐 Mizuki 的 ▎） */
+.gd-item .item-title::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 0.92em;
+  margin-right: 9px;
+  vertical-align: -0.08em;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--gd-primary), var(--gd-accent));
+}
+/* 右侧“进入详情”箭头 */
+.gd-item .item-arrow {
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  border: 1px solid var(--gd-border);
+  background: var(--gd-surface-soft);
+  color: var(--gd-primary);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  transition:
+    transform 0.22s ease,
+    background 0.22s ease,
+    color 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
+}
+.gd-item:hover .item-arrow {
+  color: #fff;
+  border-color: transparent;
+  background: linear-gradient(120deg, var(--gd-primary), var(--gd-primary-2));
+  transform: translateX(3px);
+  box-shadow: 0 8px 18px rgba(124, 108, 255, 0.32);
+}
 .gd-item .item-meta {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 6px;
   font-size: 12.5px;
   color: var(--gd-text-sub);
+}
+/* meta 信息胶囊：图标+文字的圆角小 chip（对齐 Mizuki 的「日期/分类/字数」） */
+.gd-item .item-meta .meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  line-height: 1.7;
+  white-space: nowrap;
+  color: var(--gd-primary);
+  background: rgba(124, 108, 255, 0.1);
+  border: 1px solid rgba(124, 108, 255, 0.18);
+}
+html.dark .gd-item .item-meta .meta-chip {
+  background: rgba(157, 141, 255, 0.14);
+  border-color: rgba(157, 141, 255, 0.26);
 }
 .gd-item .item-meta .author {
   display: inline-flex;
@@ -1329,7 +1818,11 @@ html.dark .gd-calendar .cal-cell.marked {
     grid-template-columns: minmax(0, 1fr);
   }
   .gd-item .item-thumb {
-    height: 160px;
+    height: 180px;
+  }
+  /* 窄屏卡片本身就是整块可点，箭头去掉省空间 */
+  .gd-item .item-arrow {
+    display: none;
   }
   .gd-fab {
     padding: 6px;
@@ -1380,17 +1873,29 @@ html.dark .gd-calendar .cal-cell.marked {
   .gd-menu-btn {
     display: inline-flex;
   }
+  /* 窄屏放不下搜索胶囊：收起它，改由首页工具栏里的搜索框承担（见 .gd-search-narrow） */
+  .app-header .hd-search {
+    display: none !important;
+  }
 }
 @media (max-width: 720px) {
   .app-header {
     padding: 0 14px;
   }
-  .app-header .user-tag,
-  .app-header .logout-btn {
-    display: none !important;
-  }
   .brand span {
     display: none;
+  }
+}
+
+/* 首页工具栏里的搜索框：只在窄屏（顶栏搜索收起时）出现，避免两个搜索框重复。
+   注意用 .el-input.gd-search-narrow 提高优先级 —— 路由懒加载的 Element Plus 样式
+   会在 theme.css 之后注入，单类选择器会输给 .el-input{display:inline-flex} */
+.el-input.gd-search-narrow {
+  display: none;
+}
+@media (max-width: 900px) {
+  .el-input.gd-search-narrow {
+    display: inline-flex;
   }
 }
 
@@ -1424,6 +1929,20 @@ html.dark .gd-calendar .cal-cell.marked {
 }
 .gd-page-enter-from .shell {
   transform: translateY(12px);
+}
+
+/* ---------------- 无障碍：尊重系统「减弱动态效果」 ----------------
+   开启后取消所有过渡与入场动画（含路由过渡），避免前庭不适；
+   也让 Vue 的路由过渡立刻结束，不会出现等待过渡事件的情况 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* ---------------- 页脚 ---------------- */
@@ -1854,4 +2373,68 @@ html.dark .gd-tag {
   .gallery-grid {
     column-count: 1;
   }
+}
+
+/* =========================================================
+   字体分层应用（放在文件末尾，同优先级时后置生效）
+   - 标题 / 导航 / 按钮 / 卡片标题 → 站酷快乐体（圆润可爱）
+   - 其余（正文、表单、列表摘要、日记内容）→ 站酷小薇（秀气优雅）
+   注意：这两款字体都只有 400 一个字重，所以显式写 font-weight: 400，
+        否则浏览器会做「伪粗体」，笔画会发糊。
+   ========================================================= */
+.brand span,
+.hero-inner h1,
+.hero-inner p,
+.section-title,
+.gd-page-title,
+.gd-panel-title,
+.ck-title,
+.nav-item,
+.gd-tag,
+.gd-cat,
+.meta-chip,
+.gd-mini-btn,
+.um-item,
+.gd-item .item-title,
+.diary-card .title {
+  font-family: var(--gd-font-display);
+  font-weight: 400;
+}
+/* 上面这些元素在原规则里带了 700/800（伪粗体），用同选择器或更高优先级压回 400 */
+.gd-hero-full .hero-inner h1,
+.nav-item.active,
+.diary-card .title,
+.gd-item .item-title,
+.gd-panel-title,
+.ck-title {
+  font-weight: 400;
+}
+/* Element Plus 组件：加 html 前缀提高优先级 —— 组件样式可能来自懒加载的路由
+   分包，会在 theme.css 之后注入，同优先级的规则会被它盖掉 */
+html .el-button,
+html .el-tag,
+html .el-message__content,
+html .el-message-box__title,
+html .el-message-box__message,
+html .el-dialog__title,
+html .el-empty__description,
+html .el-select-dropdown__item,
+html .el-pagination button,
+html .el-pager li,
+html .el-drawer .drawer-item {
+  font-family: var(--gd-font-display);
+  font-weight: 400;
+}
+/* 表单控件默认是浏览器给的 Arial（UA 样式），显式指回正文字体，否则「标签是可爱体、
+   输入内容是 Arial」会割裂；输入框里是用户内容，用正文字体也更易读 */
+html .el-input__inner,
+html .el-textarea__inner,
+html .el-select__wrapper,
+html .el-select__input {
+  font-family: var(--gd-font-body);
+}
+
+/* 数字/统计值仍用正文字体，避免圆体的字形花俏影响对齐 */
+.gd-stats .v {
+  font-family: var(--gd-font-body);
 }

@@ -12,15 +12,18 @@ import com.flandreyu.common.Result;
 import com.flandreyu.service.StatsService;
 import com.flandreyu.util.UserSessionUtil;
 import com.flandreyu.vo.CalendarMarkVO;
+import com.flandreyu.vo.HeatmapVO;
 import com.flandreyu.vo.SiteStatsVO;
 import com.flandreyu.vo.TagCountVO;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 /**
  * 站点统计 / 日历打点（首页右侧边栏）
  */
+@Tag(name = "统计模块", description = "站点总量、写作热力图、日历打点、标签排行")
 @RestController
 @RequestMapping("/api/stats")
 @RequiredArgsConstructor
@@ -47,5 +50,22 @@ public class StatsController {
     public Result<List<CalendarMarkVO>> calendar(@RequestParam(required = false) String month,
             HttpSession session) {
         return Result.ok(statsService.calendar(UserSessionUtil.requireId(session), month));
+    }
+
+    /**
+     * 写作热力图（近 N 天每日篇数/字数 + 活跃天数/连续天数）
+     * <p>
+     * userId 省略 → 看自己的（含私密日记，需登录）；<br>
+     * userId 有值 → 看该用户的公开日记（匿名可见）。
+     */
+    @GetMapping("/heatmap")
+    @PublicApi
+    public Result<HeatmapVO> heatmap(@RequestParam(required = false) Long userId,
+            @RequestParam(defaultValue = "365") int days,
+            HttpSession session) {
+        if (userId == null) {
+            return Result.ok(statsService.heatmap(UserSessionUtil.requireId(session), days, false));
+        }
+        return Result.ok(statsService.heatmap(userId, days, true));
     }
 }

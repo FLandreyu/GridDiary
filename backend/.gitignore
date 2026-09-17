@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### 打包产物：package.ps1 会把 frontend/dist 复制到这里（随 jar 一起发布） ###
+src/main/resources/static/

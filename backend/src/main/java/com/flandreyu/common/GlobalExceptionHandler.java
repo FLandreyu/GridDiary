@@ -6,6 +6,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,6 +38,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<Result<Void>> handleMaxUploadSize(MaxUploadSizeExceededException e) {
         return ResponseEntity.badRequest().body(Result.error(400, "上传文件过大，单张不超过 5MB"));
+    }
+
+    /**
+     * 静态资源不存在（图片被删/路径失效，Spring 6.1+ 会抛 NoResourceFoundException）。
+     *
+     * <p>
+     * 必须单独处理：否则会落到下面的兜底分支，把「图片不存在」当成 500 服务器错误，
+     * 既误导前端、又会刷满堆栈日志。
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Result<Void>> handleNoResourceFound(NoResourceFoundException e) {
+        log.warn("静态资源不存在：{}", e.getMessage());
+        return ResponseEntity.status(404).body(Result.error(404, "资源不存在"));
     }
 
     /** 兜底异常 */

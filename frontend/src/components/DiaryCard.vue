@@ -98,14 +98,13 @@ function firstChar(nick) {
   transition:
     transform 0.15s ease,
     box-shadow 0.15s ease;
-  border: 1px solid var(--gd-border);
 }
 .diary-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--gd-shadow-hover);
 }
 .cover {
-  height: 160px;
+  height: 180px;
   background: var(--gd-surface-soft);
   position: relative;
 }

@@ -3,6 +3,7 @@ package com.flandreyu.service;
 import java.util.List;
 
 import com.flandreyu.vo.CalendarMarkVO;
+import com.flandreyu.vo.HeatmapVO;
 import com.flandreyu.vo.SiteStatsVO;
 import com.flandreyu.vo.TagCountVO;
 
@@ -23,4 +24,11 @@ public interface StatsService {
      * @param month yyyy-MM，为空取当月
      */
     List<CalendarMarkVO> calendar(long userId, String month);
+
+    /**
+     * 写作热力图：最近 days 天的每日篇数/字数 + 活跃天数/连续天数
+     *
+     * @param onlyPublic true 时只统计公开日记（看他人主页）
+     */
+    HeatmapVO heatmap(long userId, int days, boolean onlyPublic);
 }

@@ -12,12 +12,14 @@ import com.flandreyu.service.LikeService;
 import com.flandreyu.util.UserSessionUtil;
 import com.flandreyu.vo.LikeVO;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 /**
  * 点赞接口（需求 6：点赞数实时返回）
  */
+@Tag(name = "点赞模块", description = "日记点赞 / 取消点赞")
 @RestController
 @RequestMapping("/api/diary")
 @RequiredArgsConstructor

@@ -17,6 +17,7 @@ import com.flandreyu.service.CommentService;
 import com.flandreyu.util.UserSessionUtil;
 import com.flandreyu.vo.CommentVO;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 /**
  * 评论接口（需求 6）
  */
+@Tag(name = "评论模块", description = "日记评论的发布与删除")
 @RestController
 @RequestMapping("/api/diary")
 @RequiredArgsConstructor

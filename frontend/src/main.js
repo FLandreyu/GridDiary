@@ -9,6 +9,10 @@ import "element-plus/theme-chalk/el-overlay.css";
 import "element-plus/theme-chalk/el-loading.css";
 import "element-plus/theme-chalk/el-message.css";
 import "element-plus/theme-chalk/el-message-box.css";
+// 字体：站酷快乐体（标题/UI）+ 站酷小薇（正文），均为开源可商用
+// 走 npm 本地打包（不依赖外网 CDN）；中文按 unicode-range 分片，浏览器只下用到的分片
+import "@fontsource/zcool-kuaile";
+import "@fontsource/zcool-xiaowei";
 import App from "./App.vue";
 import router from "./router";
 import "./styles.css";

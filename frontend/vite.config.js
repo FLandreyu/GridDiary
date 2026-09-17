@@ -29,4 +29,13 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    // 字体分片（woff2）永远不内联成 base64：中文字体按 unicode-range 切成上百个小片，
+    // 若被内联进 CSS，首屏会把所有分片一次性下载（实测 CSS 81KB → 375KB）；
+    // 保持独立文件后，浏览器只按 unicode-range 取用到的 1~3 个分片
+    assetsInlineLimit: (filePath) =>
+      filePath.endsWith(".woff2") || filePath.endsWith(".woff")
+        ? false
+        : undefined,
+  },
 });

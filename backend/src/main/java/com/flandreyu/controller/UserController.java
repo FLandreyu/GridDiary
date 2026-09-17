@@ -21,6 +21,7 @@ import com.flandreyu.service.UserService;
 import com.flandreyu.vo.UserStatsVO;
 import com.flandreyu.vo.UserVO;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 /**
  * 用户模块接口
  */
+@Tag(name = "用户模块", description = "注册、登录、资料维护、个人统计")
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor

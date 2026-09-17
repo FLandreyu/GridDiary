@@ -7,6 +7,7 @@ import AppSidebar from "../components/AppSidebar.vue";
 import DiaryCard from "../components/DiaryCard.vue";
 import SkeletonCards from "../components/SkeletonCards.vue";
 import TwoColLayout from "../components/TwoColLayout.vue";
+import WriteHeatmap from "../components/WriteHeatmap.vue";
 import { useUserStore } from "../store/user";
 
 const store = useUserStore();
@@ -79,6 +80,8 @@ onMounted(() => load(1));
       </div>
     </div>
 
+    <WriteHeatmap class="mine-heatmap" title="我的写作热力图" />
+
     <div v-loading="loading && records.length > 0">
       <SkeletonCards v-if="loading && !records.length" type="grid" :count="6" />
 
@@ -129,7 +132,7 @@ onMounted(() => load(1));
     </div>
 
     <template #aside>
-      <AppSidebar />
+      <AppSidebar :heatmap="false" />
     </template>
   </TwoColLayout>
 </template>
@@ -144,6 +147,9 @@ onMounted(() => load(1));
 .section-title {
   margin: 0;
   font-size: 20px;
+}
+.mine-heatmap {
+  margin-bottom: 18px;
 }
 .grid {
   display: grid;

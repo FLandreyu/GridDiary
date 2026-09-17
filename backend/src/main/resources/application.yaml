@@ -6,21 +6,35 @@ spring:
     name: backend
   datasource:
     url: jdbc:mysql://localhost:3306/grid_diary?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
-    username: root
-    password: CHANGE_ME
+    # 优先读环境变量 DB_USERNAME / DB_PASSWORD，未设置时回退默认值（勿把真实口令提交到仓库）
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
   servlet:
     multipart:
-      max-file-size: 5MB          # 单张图片上限
-      max-request-size: 50MB      # 一次请求总大小（多图上传）
+      max-file-size: 5MB # 单张图片上限
+      max-request-size: 50MB # 一次请求总大小（多图上传）
 
 mybatis:
-  mapper-locations: classpath:mapper/*.xml   # Mapper XML 位置
+  mapper-locations: classpath:mapper/*.xml # Mapper XML 位置
   type-aliases-package: com.flandreyu.entity # 实体别名包
   configuration:
-    map-underscore-to-camel-case: true       # 下划线转驼峰
+    map-underscore-to-camel-case: true # 下划线转驼峰
 
-# 图片上传目录（相对 backend 运行目录；也可写绝对路径）
+# 图片上传目录
+# 开发运行：相对运行目录的 ./upload
+# 打包运行：启动类会注入 app.home = exe 所在目录，图片存放在 exe 同级的 upload/
 app:
-  upload-dir: ./upload
+  upload-dir: ${app.home:.}/upload
 
+# 接口文档（springdoc-openapi）：访问 /swagger-ui.html
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha # 标签按字母排序
+    operations-sorter: method # 接口按请求方法排序，同一模块内更整齐
+    display-request-duration: true
+    doc-expansion: none # 默认折叠，接口多时更好找
+  default-produces-media-type: application/json

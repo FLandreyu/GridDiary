@@ -65,12 +65,11 @@ function firstChar(nick) {
           </el-avatar>
           <span>{{ diary.authorNickname || "匿名" }}</span>
         </span>
-        <i class="dot">·</i>
-        <span>{{ timeAgo(diary.createdAt) }}</span>
-        <i v-if="diary.category" class="dot">·</i>
-        <span v-if="diary.category">📂 {{ diary.category }}</span>
-        <i class="dot">·</i>
-        <span>{{ wordCountText(diary.wordCount) }}</span>
+        <span class="meta-chip">📅 {{ timeAgo(diary.createdAt) }}</span>
+        <span v-if="diary.category" class="meta-chip"
+          >📂 {{ diary.category }}</span
+        >
+        <span class="meta-chip">✍️ {{ wordCountText(diary.wordCount) }}</span>
       </div>
 
       <p v-if="diary.content" class="item-excerpt">
@@ -95,5 +94,8 @@ function firstChar(nick) {
         </span>
       </div>
     </div>
+
+    <!-- 进入详情箭头（Mizuki 列表卡右侧） -->
+    <span class="item-arrow" aria-hidden="true">›</span>
   </article>
 </template>

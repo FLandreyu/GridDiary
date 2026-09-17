@@ -1,0 +1,44 @@
+============================================================
+  GridDiary 九宫格记忆网  ·  使用说明
+============================================================
+
+【运行前准备】
+  本机需要已安装并启动 MySQL 8。
+  Windows 上启动方式：Win+R 输入 services.msc，找到 MySQL80 右键「启动」；
+  或者用管理员命令行执行：net start MySQL80
+
+【一键运行】
+  双击 GridDiary.exe
+    1) 程序会自动创建数据库 grid_diary 及全部数据表（首次运行稍慢，几秒到十几秒）
+    2) 启动完成后自动打开浏览器，地址 http://localhost:8080
+    3) 关闭程序：直接关掉 GridDiary.exe 的进程，或关掉调试版的控制台窗口
+
+  本程序已内置 Java 运行环境，目标电脑无需安装 JDK / Java。
+
+【目录说明】
+  GridDiary.exe              主程序（双击运行）
+  GridDiaryDebug.exe         调试版：带控制台窗口，能看到启动日志，排错时用
+  app\                       程序本体（jar 包）
+  runtime\                   内置的 Java 运行环境
+  config\application.yaml    配置文件：数据库账号密码、端口都在这里改
+  upload\                    日记图片（原图 + 缩略图）
+  logs\griddiary.log         运行日志
+  logs\启动失败.txt          启动失败时自动生成的错误详情
+
+【常见问题】
+  1) 双击后一闪而过 / 没有任何反应
+     → 打开 logs\启动失败.txt 查看原因；或改用 GridDiaryDebug.exe 观察控制台输出
+  2) 提示数据库连接失败（Communications link failure / Access denied）
+     → 确认 MySQL 服务已启动；确认 config\application.yaml 里的 username / password 正确
+  3) 端口 8080 被占用（Port 8080 was already in use）
+     → 改 config\application.yaml 的 server.port（例如 8090），重启程序后访问新端口
+  4) 页面能打开但日记图片显示不出来
+     → 图片实际存在 upload\ 目录。迁移程序时请把整个文件夹一起拷贝，
+       或把旧的 upload\ 内容复制到新目录下
+  5) 换了电脑演示，数据想一起搬过去
+     → 在旧机器上导出数据库：mysqldump -u root -p grid_diary > grid_diary.sql
+       在新机器上导入：mysql -u root -p grid_diary < grid_diary.sql
+
+【其它入口】
+  接口文档（Swagger UI）：http://localhost:8080/swagger-ui.html
+  首次使用请先在页面上注册账号（用户名、邮箱都需要唯一）

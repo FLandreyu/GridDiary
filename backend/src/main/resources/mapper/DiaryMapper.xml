@@ -99,4 +99,11 @@
         '%Y-%m-%d') FROM `diary` WHERE user_id = #{userId} AND created_at &gt;= #{from} AND
         created_at &lt; #{to} </select>
 
+    <!-- 写作热力图：按天汇总篇数与字数（from 含、to 不含；onlyPublic 时只算公开日记） -->
+    <select id="selectHeatmap" resultType="com.flandreyu.vo.HeatmapPointVO"> SELECT
+        DATE_FORMAT(created_at, '%Y-%m-%d') AS `date`, COUNT(*) AS `count`, IFNULL(SUM(CHAR_LENGTH(IFNULL(content,
+        ''))), 0) AS `words` FROM `diary` WHERE user_id = #{userId} AND created_at &gt;=
+        #{from} AND created_at &lt; #{to} <if test="onlyPublic"> AND is_public = 1 </if>
+        GROUP BY `date` ORDER BY `date` </select>
+
 </mapper>

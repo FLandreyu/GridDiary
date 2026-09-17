@@ -17,6 +17,7 @@ import com.flandreyu.util.UserSessionUtil;
 import com.flandreyu.vo.ConversationVO;
 import com.flandreyu.vo.MessageDetailVO;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 /**
  * 私信接口（需求 8，均需登录）
  */
+@Tag(name = "私信模块", description = "会话列表、聊天记录、发送私信")
 @RestController
 @RequestMapping("/api/message")
 @RequiredArgsConstructor

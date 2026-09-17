@@ -3,9 +3,11 @@ package com.flandreyu.service.impl;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,8 @@ import com.flandreyu.mapper.DiaryMapper;
 import com.flandreyu.service.StatsService;
 import com.flandreyu.util.TagUtil;
 import com.flandreyu.vo.CalendarMarkVO;
+import com.flandreyu.vo.HeatmapPointVO;
+import com.flandreyu.vo.HeatmapVO;
 import com.flandreyu.vo.SiteStatsVO;
 import com.flandreyu.vo.TagCountVO;
 
@@ -105,5 +109,63 @@ public class StatsServiceImpl implements StatsService {
         } catch (RuntimeException e) {
             throw new BusinessException(400, "月份格式应为 yyyy-MM");
         }
+    }
+
+    @Override
+    public HeatmapVO heatmap(long userId, int days, boolean onlyPublic) {
+        // 区间：含今天在内的最近 days 天（30 ~ 730 之间取值，避免一次拉太多）
+        int span = Math.min(Math.max(days, 30), 730);
+        LocalDate to = LocalDate.now();
+        LocalDate from = to.minusDays(span - 1L);
+
+        List<HeatmapPointVO> points = diaryMapper.selectHeatmap(
+                userId, from.toString(), to.plusDays(1).toString(), onlyPublic);
+
+        HeatmapVO vo = new HeatmapVO();
+        vo.setFrom(from.toString());
+        vo.setTo(to.toString());
+        vo.setPoints(points);
+
+        // 汇总 + 连续天数（只依赖「哪些天有写作」，用 Set 便于判断）
+        Set<LocalDate> active = new HashSet<>();
+        int totalCount = 0;
+        int totalWords = 0;
+        for (HeatmapPointVO p : points) {
+            active.add(LocalDate.parse(p.getDate()));
+            totalCount += p.getCount();
+            totalWords += p.getWords();
+        }
+        vo.setTotalCount(totalCount);
+        vo.setTotalWords(totalWords);
+        vo.setActiveDays(active.size());
+        vo.setCurrentStreak(currentStreak(active, to));
+        vo.setMaxStreak(maxStreak(active, from, to));
+        return vo;
+    }
+
+    /** 当前连续天数：今天没写则从昨天往前算（今天还没写不算断） */
+    private int currentStreak(Set<LocalDate> active, LocalDate today) {
+        LocalDate cursor = active.contains(today) ? today : today.minusDays(1);
+        int streak = 0;
+        while (active.contains(cursor)) {
+            streak++;
+            cursor = cursor.minusDays(1);
+        }
+        return streak;
+    }
+
+    /** 区间内最长连续天数 */
+    private int maxStreak(Set<LocalDate> active, LocalDate from, LocalDate to) {
+        int best = 0;
+        int cur = 0;
+        for (LocalDate d = from; !d.isAfter(to); d = d.plusDays(1)) {
+            if (active.contains(d)) {
+                cur++;
+                best = Math.max(best, cur);
+            } else {
+                cur = 0;
+            }
+        }
+        return best;
     }
 }

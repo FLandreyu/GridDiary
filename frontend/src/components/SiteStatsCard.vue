@@ -32,15 +32,15 @@ const rows = computed(() => {
     <div class="gd-panel-title">📊 站点统计</div>
     <div class="gd-stats">
       <template v-if="stats">
-        <template v-for="r in rows" :key="r.k">
+        <div v-for="r in rows" :key="r.k" class="stat-row">
           <span class="k">{{ r.k }}</span>
           <span class="v">{{ r.v }}</span>
-        </template>
+        </div>
       </template>
-      <template v-else>
+      <div v-else class="stat-row">
         <span class="k">加载中…</span>
         <span class="v">—</span>
-      </template>
+      </div>
     </div>
   </div>
 </template>

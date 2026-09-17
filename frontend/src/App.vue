@@ -82,6 +82,47 @@ async function onLogout() {
   }
 }
 
+/* ---------------- 顶栏搜索（回车→回首页按关键词筛选） ---------------- */
+const searchText = ref("");
+watch(
+  () => router.currentRoute.value.query.keyword,
+  (k) => {
+    searchText.value = k || "";
+  },
+  { immediate: true },
+);
+
+function onSearch() {
+  const kw = searchText.value.trim();
+  router.push({ path: "/", query: kw ? { keyword: kw } : {} }).catch(() => {});
+}
+
+/* ---------------- 头像下拉菜单（把文字按钮收进菜单，顶栏只留图标） ----------------
+   自己用绝对定位实现，不引入 el-dropdown：后者会把 popper 基建拉进主包（+65KB） */
+const avatarChar = computed(() => {
+  const n = store.user?.nickname || store.user?.username || "?";
+  return n.charAt(0).toUpperCase();
+});
+const userMenu = ref(false);
+
+function onUserCommand(cmd) {
+  userMenu.value = false;
+  if (cmd === "home") router.push(`/user/${store.user?.id}`);
+  else if (cmd === "edit") router.push("/profile/edit");
+  else if (cmd === "logout") onLogout();
+}
+
+/** 点击菜单外部 / 路由变化时自动收起 */
+function onDocClick(e) {
+  if (!e.target?.closest?.(".gd-usermenu-wrap")) userMenu.value = false;
+}
+onMounted(() => document.addEventListener("click", onDocClick));
+onBeforeUnmount(() => document.removeEventListener("click", onDocClick));
+watch(
+  () => router.currentRoute.value.fullPath,
+  () => (userMenu.value = false),
+);
+
 /* ---------------- 窄屏抽屉菜单（顶栏导航在 <900px 会被隐藏） ---------------- */
 const menuVisible = ref(false);
 const NAVS = [
@@ -149,30 +190,70 @@ function closeAndLogout() {
         </nav>
       </div>
       <div class="right">
+        <form class="hd-search" role="search" @submit.prevent="onSearch">
+          <span class="hd-search-ico" aria-hidden="true">🔍</span>
+          <input
+            v-model="searchText"
+            class="hd-search-input"
+            type="search"
+            placeholder="搜索日记…"
+            aria-label="搜索日记"
+            maxlength="50"
+          />
+        </form>
+
         <template v-if="store.isLogin">
-          <el-tag
-            class="user-tag"
-            type="success"
-            title="查看我的主页"
-            @click="router.push(`/user/${store.user?.id}`)"
-            style="cursor: pointer"
-            >{{ store.user?.nickname }}</el-tag
-          >
-          <el-button class="logout-btn" size="small" @click="onLogout"
-            >退出登录</el-button
-          >
+          <div class="gd-usermenu-wrap">
+            <button
+              class="gd-icon-btn gd-avatar-btn"
+              :title="store.user?.nickname"
+              :aria-label="`账号菜单：${store.user?.nickname || ''}`"
+              :aria-expanded="userMenu"
+              aria-haspopup="menu"
+              @click="userMenu = !userMenu"
+            >
+              <img
+                v-if="store.user?.avatar"
+                class="hd-avatar-img"
+                :src="store.user.avatar"
+                alt=""
+              />
+              <span v-else class="hd-avatar-char">{{ avatarChar }}</span>
+            </button>
+            <div v-if="userMenu" class="gd-usermenu" role="menu">
+              <button
+                class="um-item"
+                role="menuitem"
+                @click="onUserCommand('home')"
+              >
+                👤 我的主页
+              </button>
+              <button
+                class="um-item"
+                role="menuitem"
+                @click="onUserCommand('edit')"
+              >
+                ⚙️ 编辑资料
+              </button>
+              <button
+                class="um-item danger"
+                role="menuitem"
+                @click="onUserCommand('logout')"
+              >
+                🚪 退出登录
+              </button>
+            </div>
+          </div>
         </template>
         <template v-else>
-          <el-button size="small" @click="router.push('/login')"
-            >登录</el-button
-          >
-          <el-button
-            size="small"
-            type="primary"
-            @click="router.push('/register')"
-            >注册</el-button
-          >
+          <button class="gd-mini-btn" @click="router.push('/login')">
+            登录
+          </button>
+          <button class="gd-mini-btn primary" @click="router.push('/register')">
+            注册
+          </button>
         </template>
+
         <button
           class="gd-theme-btn"
           :title="theme.isDark ? '切换白天模式' : '切换夜间模式'"
@@ -259,6 +340,8 @@ function closeAndLogout() {
   align-items: center;
   gap: 26px;
   min-width: 0;
+  /* 占满「品牌 → 右侧工具」之间的全部空间 */
+  flex: 1;
 }
 .right {
   display: flex;
@@ -268,7 +351,12 @@ function closeAndLogout() {
 }
 .nav {
   display: flex;
-  gap: 8px;
+  /* 项间只留 2px：hover 胶囊不会粘在一起 */
+  gap: 2px;
+  /* 导航接管中间空间，六项均匀分布 → 顶栏中间不再留空 */
+  flex: 1;
+  justify-content: space-between;
+  margin-right: 18px;
 }
 /* 注意：颜色由 styles/theme.css 统一控制（胶囊 + 渐变），这里只留布局 */
 .nav-item {
